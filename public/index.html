@@ -58,7 +58,7 @@
       }
       var email = document.getElementById('email1').value
       disableEmailForms(email)
-      record('subscribe', 'email=' + email)
+      record('subscribe', 'linkNumber=1&email=' + email)
     }
 
     function subscribe2() {
@@ -67,7 +67,7 @@
       }
       var email = document.getElementById('email2').value
       disableEmailForms(email)
-      record('subscribe', 'email=' + email)
+      record('subscribe', 'linkNumber=2&email=' + email)
     }
 
     function disableEmailForms(email) {
@@ -87,7 +87,7 @@
 
     function record(urlSuffix, sendstr) {
       // postAsync('http://localhost:3006/' + urlSuffix, sendstr)
-      postAsync('http://dataindependence.net:3006/' + urlSuffix, sendstr)
+      postAsync(urlSuffix, sendstr)
     }
 
     function postAsync(url2get, sendstr) {
