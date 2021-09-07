@@ -88,4 +88,4 @@ app.get('/test', (_req, _res) => {
 app.use(express.static('public'))
 
 
-export default app;
+module.exports = app;
