@@ -1,4 +1,4 @@
-var app = require("./app.js");
+var app = require("./greenlockApp.js");
  
 require("greenlock-express")
     .init({
