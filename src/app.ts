@@ -1,73 +1,91 @@
-import Koa from 'koa'
-import Router from 'koa-router'
+import express from 'express'
+import bodyParser from 'body-parser'
 import { createWriteStream } from "fs";
 
-const serve = require('koa-static')
 
-const app = new Koa()
-const router = new Router()
+const app = express()
+app.use(require('request-ip').mw())
+var urlencodedParser = bodyParser.urlencoded({ extended: false, parameterLimit: 2 })
 
-router.post('/blog', (_ctx, _next) => {
+export var all_actions_file = createWriteStream(__dirname + '/../logs/allActions.log', { flags: 'a' });
+var blog_file = createWriteStream(__dirname + '/../logs/blog.log', { flags: 'a' });
+var contact_file = createWriteStream(__dirname + '/../logs/contact.log', { flags: 'a' });
+var github_file = createWriteStream(__dirname + '/../logs/github.log', { flags: 'a' });
+var subscribe_file = createWriteStream(__dirname + '/../logs/subscribe.log', { flags: 'a' });
+var visit_file = createWriteStream(__dirname + '/../logs/visit.log', { flags: 'a' });
 
-})
-
-router.post('/code', (_ctx, _next) => {
-
-})
-
-router.post('/contact', (_ctx, _next) => {
-
-})
-
-router.post('/learnRevenue', (_ctx, _next) => {
-
-})
-
-router.post('/learnSecurity', (_ctx, _next) => {
+app.post('/blog', (_req, _res) => {
+  var logEntry = new Date().toISOString() + '\t' + (_req as any).clientIp + '\tBLOG    \n'
+  blog_file.write(logEntry)
+  all_actions_file.write('BLOG         \t' + logEntry)
+  _res.send('operation recorded')
 
 })
 
-router.post('/load', (_ctx, _next) => {
+app.post('/githubTop', (_req, _res) => {
+  var logEntry = new Date().toISOString() + '\t' + (_req as any).clientIp + '\tTOP     \n'
+  github_file.write(logEntry)
+  all_actions_file.write('GITHUB       \t' + logEntry)
+  _res.send('operation recorded')
 
 })
 
-router.post('/subscribe', (_ctx, _next) => {
+app.post('/githubBottom', (_req, _res) => {
+  var logEntry = new Date().toISOString() + '\t' + (_req as any).clientIp + '\tBOTTOM  \n'
+  github_file.write(logEntry)
+  all_actions_file.write('GITHUB       \t' + logEntry)
+  _res.send('operation recorded')
 
 })
 
-router.get('/test', (_ctx, _next) => {
+app.post('/contact', (_req, _res) => {
+  var logEntry = new Date().toISOString() + '\t' + (_req as any).clientIp + '\n'
+  contact_file.write(logEntry)
+  all_actions_file.write('CONTACT      \t' + logEntry)
+  _res.send('operation recorded')
 
 })
 
-app.use(async ctx => {
-  if(ctx.is("blog")) {
-    
-  } else if(ctx.is("code")) {
-    
-  } else if(ctx.is("contact")) {
-    
-  } else if(ctx.is("learnRevenue")) {
+app.post('/learnRevenue', (_req, _res) => {
+  var logEntry = new Date().toISOString() + '\t' + (_req as any).clientIp + '\tREVENUE \n'
+  blog_file.write(logEntry)
+  all_actions_file.write('BLOG         \t' + logEntry)
+  _res.send('operation recorded')
+})
 
-  } else if(ctx.is("learnSecurity")) {
+app.post('/learnSecurity', (_req, _res) => {
+  var logEntry = new Date().toISOString() + '\t' + (_req as any).clientIp + '\tSECURITY\n'
+  blog_file.write(logEntry)
+  all_actions_file.write('BLOG         \t' + logEntry)
+  _res.send('operation recorded')
+})
 
-  } else if(ctx.is("load")) {
+app.post('/load', (_req, _res) => {
+  var logEntry = new Date().toISOString() + '\t' + (_req as any).clientIp + '\n'
+  visit_file.write(logEntry)
+  all_actions_file.write('LOAD PAGE    \t' + logEntry)
+  _res.send('operation recorded')
+})
 
-  } else if(ctx.is("subscribe")) {
-    
-  } else if(ctx.is("test")) {
-    
-  } else if(ctx.is("")) {
-    
-  } else if(ctx.is("/")) {
-    
-  } else if(ctx.is("index.html")) {
-    
+app.post('/subscribe', urlencodedParser, (_req, _res) => {
+  const body = _req.body
+
+  if (!body.linkNumber || !body.email) {
+    _res.send('not subscribed')
+    return
   }
-  ctx.body = 'Hello World';
-});
+  var logEntry = new Date().toISOString() + '\t' + (_req as any).clientIp + '\t' + ((body.linkNumber == 1) ? 'TOP     ' : 'BOTTOM  ') + '\t' + body.email + '\n'
+  subscribe_file.write(logEntry)
+  all_actions_file.write('SUBSCRIBE    \t' + logEntry)
+  _res.send('operation recorded')
+})
 
-app
-  .use(router.routes())
-  .use(router.allowedMethods());
+app.get('/test', (_req, _res) => {
+  _res.send('test')
+
+})
+
+app.use(express.static('public'))
+
 
 export default app;
