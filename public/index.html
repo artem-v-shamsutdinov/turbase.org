@@ -29,6 +29,7 @@
 }</script>
   <script>
     function recordLoad() {
+      /*
       document.getElementById('email1').addEventListener("keyup", function (event) {
         if (event.key === "Enter") {
           subscribe1();
@@ -40,6 +41,7 @@
           subscribe2();
         }
       });
+      */
       record('load', '')
     }
     function recordLearnRevenue() {
@@ -72,18 +74,22 @@
       if (emailSubmitted) {
         return
       }
-      var email = document.getElementById('email1').value
-      disableEmailForms(email)
+      //var email = document.getElementById('email1').value
+      var email = 'YouTube channel'
+      //disableEmailForms(email)
       record('subscribe', 'linkNumber=1&email=' + email)
+      window.location.href = 'https://www.youtube.com/channel/UCBBx4VJ73clVeUmUL9z9d2g'
     }
 
     function subscribe2() {
       if (emailSubmitted) {
         return
       }
-      var email = document.getElementById('email2').value
-      disableEmailForms(email)
+      //var email = document.getElementById('email2').value
+      var email = 'YouTube channel'
+      //disableEmailForms(email)
       record('subscribe', 'linkNumber=2&email=' + email)
+      window.location.href = 'https://www.youtube.com/channel/UCBBx4VJ73clVeUmUL9z9d2g'
     }
 
     function disableEmailForms(email) {
@@ -138,7 +144,7 @@
   <meta property="og:type" content="website">
 </head>
 
-<body onload="recordLoad();" data-home-page="Home.html" data-home-page-title="Home" class="u-body">
+<body onload="recordLoad();" data-home-page="index.html" data-home-page-title="Home" class="u-body">
   <header class="u-clearfix u-header u-header" id="sec-3b9d">
     <div class="u-clearfix u-sheet u-valign-middle-xl u-sheet-1">
       <a href="https://nicepage.com" class="u-image u-logo u-image-1" data-image-width="1200" data-image-height="1200">
@@ -166,19 +172,19 @@
           <ul class="u-custom-font u-nav u-unstyled u-nav-1">
             <li class="u-nav-item"><a
                 class="u-button-style u-nav-link u-text-active-custom-color-1 u-text-hover-custom-color-2"
-                href="Home.html#carousel_69ef" data-page-id="700718257" style="padding: 10px 20px;">Intro</a>
+                href="index.html#carousel_69ef" data-page-id="700718257" style="padding: 10px 20px;">Intro</a>
             </li>
             <li class="u-nav-item"><a
                 class="u-button-style u-nav-link u-text-active-custom-color-1 u-text-hover-custom-color-2"
-                href="Home.html#carousel_e37d" data-page-id="700718257" style="padding: 10px 20px;">Earn</a>
+                href="index.html#carousel_e37d" data-page-id="700718257" style="padding: 10px 20px;">Earn</a>
             </li>
             <li class="u-nav-item"><a
                 class="u-button-style u-nav-link u-text-active-custom-color-1 u-text-hover-custom-color-2"
-                href="Home.html#carousel_2115" data-page-id="700718257" style="padding: 10px 20px;">Secure</a>
+                href="index.html#carousel_2115" data-page-id="700718257" style="padding: 10px 20px;">Secure</a>
             </li>
             <li class="u-nav-item"><a
                 class="u-button-style u-nav-link u-text-active-custom-color-1 u-text-hover-custom-color-2"
-                href="Home.html#carousel_3341" data-page-id="700718257" style="padding: 10px 20px;">Learn</a>
+                href="index.html#carousel_3341" data-page-id="700718257" style="padding: 10px 20px;">Learn</a>
             </li>
           </ul>
         </div>
@@ -187,16 +193,16 @@
             <div class="u-sidenav-overflow">
               <div class="u-menu-close"></div>
               <ul class="u-align-center u-nav u-popupmenu-items u-unstyled u-nav-2">
-                <li class="u-nav-item"><a class="u-button-style u-nav-link" href="Home.html#carousel_69ef"
+                <li class="u-nav-item"><a class="u-button-style u-nav-link" href="index.html#carousel_69ef"
                     data-page-id="700718257" style="padding: 10px 20px;">Intro</a>
                 </li>
-                <li class="u-nav-item"><a class="u-button-style u-nav-link" href="Home.html#carousel_e37d"
+                <li class="u-nav-item"><a class="u-button-style u-nav-link" href="index.html#carousel_e37d"
                     data-page-id="700718257" style="padding: 10px 20px;">Earn</a>
                 </li>
-                <li class="u-nav-item"><a class="u-button-style u-nav-link" href="Home.html#carousel_2115"
+                <li class="u-nav-item"><a class="u-button-style u-nav-link" href="index.html#carousel_2115"
                     data-page-id="700718257" style="padding: 10px 20px;">Secure</a>
                 </li>
-                <li class="u-nav-item"><a class="u-button-style u-nav-link" href="Home.html#carousel_3341"
+                <li class="u-nav-item"><a class="u-button-style u-nav-link" href="index.html#carousel_3341"
                     data-page-id="700718257" style="padding: 10px 20px;">Learn</a>
                 </li>
               </ul>
@@ -217,25 +223,55 @@
         <div class="u-container-layout u-container-layout-1">
           <h3 class="u-custom-font u-text u-text-grey-50 u-text-1">own YOUR DATA WITH ON-PHONE DATABASE</h3>
           <h2 class="u-align-left u-custom-font u-text u-text-custom-color-1 u-text-2">Turbase</h2>
+          <p class="u-custom-font u-text u-text-3" style="text-align: center;">
+            <style>
+              @media (min-width: 767px) {
+                iframe {
+                  height: 315px;
+                  width: 560px;
+                }
+              }
+
+              @media (min-width: 576px) and (max-width: 767px) {
+                iframe {
+                  height: 237px;
+                  width: 420px;
+                }
+              }
+
+              @media (max-width: 576px) {
+                iframe {
+                  height: 158px;
+                  width: 280px;
+                }
+              }
+            </style>
+            <iframe onclick="alert('clicked iframe')" src="https://www.youtube.com/embed/lgZnXqQUP9U" title="YouTube video player" frameborder="0"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowfullscreen></iframe>
+          </p>
           <p class="u-custom-font u-text u-text-3">Turbase is a revolutionary new App that keeps your data on your
             device.&nbsp; It shares data with other devices through IPFS and Arweave blockchains.&nbsp; Phone and web
             applications access data directly on the device without having to store it themselves or send it over the
             network.&nbsp; Turbase puts you in control of who you share data with and how much you share.<br>
-            <br>Turbase uses the <a onclick="recordGithubTop()" href="https://github.com/autonomous-interdependent-repositories/AIRport"
+            <br>Turbase uses the <a onclick="recordGithubTop()"
+              href="https://github.com/autonomous-interdependent-repositories/AIRport"
               class="u-active-none u-border-none u-btn u-button-link u-button-style u-hover-none u-none u-text-palette-1-base u-btn-1">AIRport
               Decentralized Application framework</a>.&nbsp; It is now under ​heavy&nbsp;development and will be
-            ​available&nbsp;in 2022.&nbsp; Subscribe to the monthly Turbase newsletter to stay tuned.
+            ​available&nbsp;in 2022.&nbsp; Subscribe to the Turbase channel to stay tuned.
           </p>
           <div class="u-form u-form-1">
             <form action="#" method="POST" class="u-clearfix u-form-spacing-10 u-form-vertical u-inner-form"
               source="custom" name="form-1" style="padding: 10px;">
               <input type="hidden" id="siteId" name="siteId" value="1865615000">
               <input type="hidden" id="pageId" name="pageId" value="700718257">
+              <!--
               <div class="u-form-email u-form-group">
                 <label for="email-19f9" class="u-form-control-hidden u-label"></label>
                 <input type="email" placeholder="Enter your email address" id="email1" name="email"
                   class="u-border-1 u-border-grey-30 u-input u-input-rectangle u-white" required="">
               </div>
+              -->
               <div class="u-align-left u-form-group u-form-submit">
                 <a onclick="subscribe1();" href="#" id="subscribe1"
                   class="u-btn u-btn-round u-btn-submit u-button-style u-custom-color-1 u-custom-font u-hover-custom-color-2 u-radius-15 u-btn-2">SUBSCRIBE</a>
@@ -327,7 +363,8 @@
           <h1 class="u-custom-font u-text u-text-1">Stay tuned</h1>
           <p class="u-custom-font u-text u-text-2">Turbase and the AIRport engine behind it are now under heavy
             development stay tuned in on what's going on by subscribing to the monthly newsletter.&nbsp; Checkout the
-            development progress on <a onclick="recordGithubBottom()" href="https://github.com/autonomous-interdependent-repositories/AIRport"
+            development progress on <a onclick="recordGithubBottom()"
+              href="https://github.com/autonomous-interdependent-repositories/AIRport"
               class="u-active-none u-border-none u-btn u-button-link u-button-style u-hover-none u-none u-text-white u-btn-1">Github</a>
             or visit the <a onclick="recordBlog()" href="https://dataindependence.net/blog/"
               class="u-active-none u-border-none u-btn u-button-link u-button-style u-hover-none u-none u-text-white u-btn-2">blog</a>
@@ -338,11 +375,13 @@
               name="form" style="padding: 10px;">
               <input type="hidden" id="siteId" name="siteId" value="1865615000">
               <input type="hidden" id="pageId" name="pageId" value="700718257">
+              <!--
               <div class="u-form-email u-form-group">
                 <label for="email-960a" class="u-form-control-hidden u-label"></label>
                 <input type="email" placeholder="Enter your email address" id="email2" name="email"
                   class="u-border-1 u-border-grey-30 u-input u-input-rectangle u-white" required="" maxlength="100">
               </div>
+              -->
               <div
                 class="u-align-left-lg u-align-left-md u-align-left-xl u-align-right-sm u-align-right-xs u-form-group u-form-submit">
                 <a onclick="subscribe2();" href="#" id="subscribe2"
