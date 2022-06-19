@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html class="no-js" lang="en">
+
+<head>
+
+    <!--- basic page needs
+    ================================================== -->
+    <meta charset="utf-8">
+    <title>AIRport Blog</title>
+    <meta name="description" content="Application Interoperability">
+    <meta name="author" content="Artem V Shamsutdinov">
+
+    <!-- mobile specific metas
+    ================================================== -->
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- CSS
+    ================================================== -->
+    <link rel="stylesheet" href="../css/base.css">
+    <link rel="stylesheet" href="../css/vendor.css">
+    <link rel="stylesheet" href="../css/main.css">
+
+    <!-- script
+    ================================================== -->
+    <script src="../js/modernizr.js"></script>
+
+    <!-- favicons
+    ================================================== -->
+    <link rel="apple-touch-icon" sizes="180x180" href="../apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="../favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
+    <link rel="manifest" href="../site.webmanifest">
+
+</head>
+
+<body class="ss-bg-white">
+
+    <!-- preloader
+================================================== -->
+    <div id="preloader">
+        <div id="loader" class="dots-fade">
+            <div></div>
+            <div></div>
+            <div></div>
+        </div>
+    </div>
+
+    <div id="top" class="s-wrap site-wrapper">
+
+        <!-- site header
+    ================================================== -->
+        <header class="s-header header">
+        </header> <!-- end s-header -->
+
+
+        <!-- site content
+    ================================================== -->
+        <div class="s-content content">
+            <main class="row content__page">
+
+                <article class="column large-full entry format-standard">
+
+                    <div class="media-wrap entry__media">
+                        <div class="entry__post-thumb">
+                            <img alt="lithium corrosion sample" sizes="(max-width: 1000px) 100vw, 1000px"
+                                src="images/experts-chip-away-at-managing-lithium-corrosion.jpg">
+                            <p style="text-align: center; width: 100%">
+                                Experts at <a href="https://www.ornl.gov/">Oak Ridge National Laboratory</a>
+                                and <a href="https://www.sciencedirect.com/science/article/pii/S2352179122000394">around
+                                    the world</a>
+                                are making progress in <a
+                                    href="https://phys.org/news/2022-06-experts-chip-corrosion-future-fusion.html">managing
+                                    lithium corrosion</a>
+                                and are getting closer to tritium recovery.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="content__page-header entry__header">
+                        <h1 class="display-1 entry__title">
+                            Solving Id Problems
+                        </h1>
+                        <ul class="entry__header-meta">
+                            <li class="author">By Artem V. Shamsutdinov</li>
+                            <li class="date">June 18th, 2022</li>
+                        </ul>
+                    </div> <!-- end entry__header -->
+
+                    <div class="entry__content">
+                        <p>
+                            AIRport Id scheme <a href="https://dataindependence.net/blog/2022/AIR_UuId.html">has an
+                                optimization</a>
+                            for local storage of globally unique Ids. It is a limiting factor
+                            that is leading to a new way of doing things.
+                        </p>
+                        <p>
+                            AIRport runs both on the client and the server. On the client
+                            it runs in a separate browser tab (or as a native app). There
+                            it manages the user's data directly without any
+                            intermediate third party servers. The user can trust third
+                            party code better on their device than anywhere else. In
+                            effect they get their own server every time they use AIRport and
+                            (given that all application code can be inspected) this is as close
+                            as we can currently get to no third party interference with
+                            user data.
+                        </p>
+                        <p>
+                            On the client everything is pretty straightforward - you get one
+                            local database where all your repositories are stored.
+                            The local integer Id scheme works well there,
+                            it saves space and query time. UuIds are only retrieved
+                            when you have to look objects up in other repositories.
+                        </p>
+                        <p>
+                            Technically on the server the same thing holds true. All
+                            of the integer ids are unique to the server and still work just
+                            fine. However, when one looks further into what AIRport can
+                            do an number new scenarios become apparent where numeric Id
+                            scheme does not work.
+                        </p>
+                        <h2>
+                            Technical Problems
+                        </h2>
+                        <h3>
+                            Problem I: Decentralized & distributed
+                        </h3>
+                        <p>
+                            This scheme starts to break down when you start mixing the two.
+                            AIRport applications are meant to be run with some of the
+                            data coming from centralized (though distributed) servers
+                            and some of the data being decentralized. This mix gives you
+                            the best combination of utility and privacy. But this could
+                            lead to Id conflicts in the UIs if both distributed and
+                            decentralized data needs to be displayed on the same screen.
+                        </p>
+                        <h3>
+                            Problem II: Back-end distributed
+                        </h3>
+                        <p>
+                            On the server side, the main goal of AIRport is to allow
+                            application servers to load data from multiple completely
+                            independent data sources. The idea is for every jurisdiction
+                            to maintain its own data. This can (and at least at first will be)
+                            accomplished by having geographically distributed databases
+                            like <a href="https://www.cockroachlabs.com/">CockroachDB</a>.
+                            But eventually AIRport application servers will support getting
+                            data from completely different databases that have the same
+                            schemas. This is particularly useful when an app server is
+                            processing data across multiple governmental agencies or when
+                            its processing data of separate corporations that are not
+                            associated with each other.
+                        </p>
+                        <h3 id="performance">
+                            Problem III: Performance
+                        </h3>
+                        <p>
+                            Finally there is the problem of performance. In AIRport's case,
+                            wide column databases are about an order of magnitude faster.
+                            AIRport is particularly well suited for retrieving
+                            entire Repositories from wide-column databases: the
+                            repository record schema is extremely simple, it just
+                            has the transaction log entries that are stored as blobs. Thus,
+                            the eventual goal of AIRport on the server side is to perform all
+                            repository-scoped SQL operations in memory of the application server
+                            and just load the data from a wide column storage engine,
+                            like <a href="https://www.scylladb.com/">ScyllaDB</a>.
+                            Basically, repositories will be loaded into an in-memory SQL database
+                            in their entirety (repositories are meant to be small and focused).
+                            All of the operations that are contained within a repository will
+                            be done directly in memory. Cross-repository queries will still go
+                            to the distributed relational databases.
+                        </p>
+                        <p>
+                            Performance can be further enhanced by keeping the frequently
+                            accessed repositories in memory even after their requests are
+                            completed. The app server will then query the wide
+                            column database where repository is archived for new transaction
+                            log entries. This is where numeric ids in records, vs string ids
+                            can really help to store more data in app server memory, especially
+                            for smaller records. And for the Web implementation of AIRport,
+                            all repositories are stored in memory (with SqlJs).
+                        </p>
+                        <p>
+                            But, the numeric Ids for repositories and actors are unique only
+                            to the in-memory SQL database that is running on the application
+                            server. Thus they cannot be relied upon for persistence
+                            operations, when those operations go to another application
+                            server (because UIs aren't expected to maintain server
+                            sessions).
+                        </p>
+                        <h2>
+                            The solution
+                        </h2>
+                        <p>
+                            And, as I have just realized there is a very elegant solution to
+                            these problems. A solution that does not require storing <a
+                                href="AIR_UuId.html#performance">very long</a> global UUIDs
+                            as strings in every record (which would really matter on mobile
+                            devices):
+                        </p>
+                        <h3>
+                            On the client
+                        </h3>
+                        <p>
+                            The main problem on the client is that the UI might talk to different
+                            AIRport servers and get records from them. In turn, these records
+                            might have conflicting numeric ids (for Repositories and Actors). This
+                            would cause an incorrect display of results.
+                        </p>
+                        <p>
+                            The multiple server scenario is important because AIRport is designed
+                            for UIs that will be running against their own servers and the local
+                            <a href="https://turbase.app/">Turbase</a> at the same time.
+                        </p>
+                        <h3>
+                            "Air Bridge"
+                        </h3>
+                        <p>
+                            The solution is to always bundle a small AIRport library (airbridge)
+                            in your code and let it aggregate and re-Id all of the data. This implies
+                            that there will be a new (internal) format for query results that will
+                            include all of the Repository and Actor records present in the result (as a separate
+                            descriptor). The library would then simply populate those records in every
+                            record of the result set. Of course this helps in the standard case
+                            where there is only one server you are talking to as well.
+                        </p>
+                        <p>
+                            On the way back to the server the library will split and direct repository
+                            requests to the correct servers (by parsing the repository UuId and
+                            finding where the request should go). This will also save network
+                            bandwidth by passing in Repository and Actor records only once.
+                        </p>
+                        <h2>
+                            Transparent UuId queries
+                        </h2>
+                        <p>
+                            This approach also takes care of the inelegant problem of having to add a 'uuId'
+                            field in the query engine which looks really weird to the untrained eye
+                            and can hurt adaption:
+                        </p>
+                        <pre><code>
+this._find({
+    select: {
+        '*': Y,
+        uuId: Y,
+        anotherEntity: {}
+    }
+})
+</code></pre>
+                        <p>
+                            The natural question when one sees this syntax for the first time is:
+                            "If you are doing SELECT * why are you also including another field?"
+                            This can throw developers off and make them think that they don't
+                            get what is going on here and lose confidence in their ability
+                            to just switch to AIRport without any learning curve.
+                        </p>
+                        <p>
+                            With the new solution AIRport will simply collect all of the numeric
+                            ids on the returned results and do two more queries:
+                        </p>
+                        <pre><code>
+select: {},
+from: [
+    r = Q.Repository
+],
+where: r.id.in(repositoryNumericIds)
+
+select: {},
+from: [
+    a = Q.Actor
+],
+where: a.id.in(actorNumericIds)
+</code></pre>
+                        <h3>
+                            Faster than you think
+                        </h3>
+                        <p>
+                            This seems like a high price to pay - 3 queries instead of one. But
+                            it really only impacts performance on the most trivial of queries,
+                            where only one table is queried by Id (really fast). And the
+                            alternative would be to join the simple query to Repository and Actor
+                            entities anyway.
+                        </p>
+                        <p>
+                            But, this approach actually becomes faster than the alternative with
+                            larger queries, where every entity in the select statement would have
+                            to be separately joined to Repository and Actor. Also the
+                            native result set in memory (which is always just a table with
+                            every possible combination of records) becomes much smaller, reducing
+                            both memory and CPU requirements to process it. This also enables
+                            returning the entire Repository record and the Users behind Actors
+                            and the owning User of the Repository, almost for free. This is true since
+                            the implementation of _find and _findOne methods returns interlinked
+                            object graphs where the same Repository, Actor and User objects
+                            are pointed to by any number of referencing objects.
+                        </p>
+                        <h2>
+                            On the server
+                        </h2>
+                        <p>
+                            On the server the situation is slightly different. Application server
+                            receives records from the UI and persists them. If it has a local
+                            cache and already has the passed in Repository in it, then the Repository
+                            and Actor numeric Ids will likely be different from what is coming from
+                            the UI.
+                        </p>
+                        <p>
+                            Also there may be a duality of Ids between the underlying distributed
+                            database and the in-memory database on the app server (especially if
+                            the app server is talking to multiple separate databases).
+                        </p>
+                        <p>
+                            Having an internal format for passing in objects solves this issue. The
+                            UUIDs are always passed in and numeric ides are converted to the values
+                            the app server in it's cache (and to the values in the central
+                            distributed database). An alike adapter can be used to manage multi
+                            database (with same schemas) connections to the app server, once
+                            that becomes relevant.
+                        </p>
+                    </div> <!-- end entry content -->
+
+                </article> <!-- end column large-full entry-->
+
+                <div class="comments-wrap">
+                </div> <!-- end comment-respond -->
+
+            </main>
+
+        </div> <!-- end s-content -->
+
+
+        <!-- footer
+================================================== -->
+        <footer class="s-footer footer">
+        </footer>
+
+    </div> <!-- end s-wrap -->
+
+
+    <!-- Java Script
+================================================== -->
+    <script src="../js/post-component-loader.js"></script>
+    <script src="../js/jquery-3.2.1.min.js"></script>
+    <script src="../js/plugins.js"></script>
+    <script src="../js/main.js"></script>
+
+</body>

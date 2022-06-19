@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html class="no-js" lang="en">
+<head>
+
+    <!--- basic page needs
+    ================================================== -->
+    <meta charset="utf-8">
+    <title>AIRport Blog</title>
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <!-- mobile specific metas
+    ================================================== -->
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- CSS
+    ================================================== -->
+    <link rel="stylesheet" href="../css/base.css">
+    <link rel="stylesheet" href="../css/vendor.css">
+    <link rel="stylesheet" href="../css/main.css">
+
+    <!-- script
+    ================================================== -->
+    <script src="../js/modernizr.js"></script>
+
+    <!-- favicons
+    ================================================== -->
+    <link rel="apple-touch-icon" sizes="180x180" href="../apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="../favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
+    <link rel="manifest" href="../site.webmanifest">
+
+</head>
+
+<body class="ss-bg-white">
+
+<!-- preloader
+================================================== -->
+<div id="preloader">
+    <div id="loader" class="dots-fade">
+        <div></div>
+        <div></div>
+        <div></div>
+    </div>
+</div>
+
+<div id="top" class="s-wrap site-wrapper">
+
+    <!-- site header
+    ================================================== -->
+    <header class="s-header header">
+    </header> <!-- end s-header -->
+
+
+    <!-- site content
+    ================================================== -->
+    <div class="s-content content">
+        <main class="row content__page">
+
+            <article class="column large-full entry format-standard">
+
+                <div class="media-wrap entry__media">
+                    <div class="entry__post-thumb">
+                        <img
+                                alt="A view of Luxor, Egypt"
+                                sizes="(max-width: 2000px) 100vw, 2000px"
+                                src="images/Luxor_Egypt.jpg"
+                        >
+                    </div>
+                </div>
+
+                <div class="content__page-header entry__header">
+                    <h1 class="display-1 entry__title">
+                        Build time Queries
+                    </h1>
+                    <ul class="entry__header-meta">
+                        <li class="author">By Artem V. Shamsutdinov</li>
+                        <li class="date">Early 2020</li>
+                    </ul>
+                </div> <!-- end entry__header -->
+
+                <div class="entry__content">
+                    <p>
+                        Just like with
+                        <a href="./Verifying_Persistence.html">persistence operations</a> it is
+                        possible to process query operations at build time, while keeping all of
+                        the
+                        benefits of TypeScript type checking and auto-completion.
+                    </p>
+
+                    <p>
+                        Given the following two entities:
+                    </p>
+
+                    <pre><code>@Entity()
+<b>export class</b> Parent {
+
+    @Id()
+    @GeneratedValue()
+    key: <b>number</b>;
+
+    value: <b>string</b>;
+
+    @OneToMany({cascade: CascadeType.DELETE, mappedBy: 'parent'})
+    children: Child<[];
+}
+
+@Entity()
+<b>export class</b> Child {
+
+    @Id()
+    @GeneratedValue()
+    key: <b>number</b>;
+
+    value: <b>string</b>;
+
+    @ManyToOne()
+    parent: Parent;
+}</code></pre>
+                    <p>
+                        It is then possible to create build time query definitions:
+                    </p>
+                    <pre><code><b>export class</b> ParentDao <b>extends</b> BaseParentDao {
+
+    @Query&lt;IQParent&gt;(select({
+            id: Y,
+            value: Y,
+            children: {
+                id: Y,
+                value: Y
+            }
+        }).from(p => ({
+            p,
+            c: p.children.innerJoin()
+        }).where((parentId, notLikeChildValue, q) =>
+            q.p.id == parentId
+            && !q.c.value.like(notLikeChildValue)
+        }).orderBy(q => [
+            q.p.id.desc(),
+            q.c.id.desc()
+        ]))
+    <b>static</b> selectWithChildren: (
+           parentId: number,
+           notLikeChildValue: string
+       ) => Promise&lt;Parent[]&gt;;
+}</code></pre>
+
+                    <p>
+                        Here are the reasons for adding this functionality:
+                    </p>
+                    <ul>
+                        <li>Allows schema publisher to lock down which queries can be performed
+                            against their schema.
+                        </li>
+                        <li>Removes the need for including the bulk of Airport client code
+                            in client applications, a very minimal stub can be generated instead
+                        </li>
+                        <li>Allows to quickly prepare a statement, without subsequent Javascript
+                            execution or additional statement for keeping track of statement ids
+                        </li>
+                        <li>Makes the where clause more readable by using native boolean
+                            and comparison operators.
+                        </li>
+                    </ul>
+
+                    <p>
+                        I have no plans for adding it right now, since I'm focusing on pushing out
+                        a basic working version. However I'm expecting this issue to land in the
+                        GA version.
+                    </p>
+                </div> <!-- end entry content -->
+
+            </article> <!-- end column large-full entry-->
+
+
+            <div class="comments-wrap">
+            </div> <!-- end comment-respond -->
+        </main>
+
+    </div> <!-- end s-content -->
+
+
+    <!-- footer
+    ================================================== -->
+    <footer class="s-footer footer">
+    </footer>
+
+</div> <!-- end s-wrap -->
+
+
+<!-- Java Script
+================================================== -->
+<script src="../js/post-component-loader.js"></script>
+<script src="../js/jquery-3.2.1.min.js"></script>
+<script src="../js/plugins.js"></script>
+<script src="../js/main.js"></script>
+
+</body>

@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html class="no-js" lang="en">
+
+<head>
+
+    <!--- basic page needs
+    ================================================== -->
+    <meta charset="utf-8">
+    <title>AIRport Blog</title>
+    <meta name="description" content="The solution for natural Dao logic">
+    <meta name="author" content="Artem V Shamsutdinov">
+
+    <!-- mobile specific metas
+    ================================================== -->
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- CSS
+    ================================================== -->
+    <link rel="stylesheet" href="../css/base.css">
+    <link rel="stylesheet" href="../css/vendor.css">
+    <link rel="stylesheet" href="../css/main.css">
+
+    <!-- script
+    ================================================== -->
+    <script src="../js/modernizr.js"></script>
+
+    <!-- favicons
+    ================================================== -->
+    <link rel="apple-touch-icon" sizes="180x180" href="../apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="../favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
+    <link rel="manifest" href="../site.webmanifest">
+
+</head>
+
+<body class="ss-bg-white">
+
+    <!-- preloader
+================================================== -->
+    <div id="preloader">
+        <div id="loader" class="dots-fade">
+            <div></div>
+            <div></div>
+            <div></div>
+        </div>
+    </div>
+
+    <div id="top" class="s-wrap site-wrapper">
+
+        <!-- site header
+    ================================================== -->
+        <header class="s-header header">
+        </header> <!-- end s-header -->
+
+
+        <!-- site content
+    ================================================== -->
+        <div class="s-content content">
+            <main class="row content__page">
+
+                <article class="column large-full entry format-standard">
+
+                    <div class="media-wrap entry__media">
+                        <div class="entry__post-thumb">
+                            <img alt="General Fusion is building a Fusion Demonstration Plant in UK"
+                                sizes="(max-width: 1000px) 100vw, 1000px" src="images/helion_energy_location.jpg">
+                            <p style="text-align: center; width: 100%"><a href="https://www.helionenergy.com/">Helion
+                                    Energy</a> is building
+                                a new facility in the state of Washington.</p>
+                        </div>
+                    </div>
+
+                    <div class="content__page-header entry__header">
+                        <h1 class="display-1 entry__title">
+                            Injecting schemas
+                        </h1>
+                        <ul class="entry__header-meta">
+                            <li class="author">By Artem V. Shamsutdinov</li>
+                            <li class="date">August 28th, 2021</li>
+                        </ul>
+                    </div> <!-- end entry__header -->
+
+                    <div class="entry__content">
+                        Internally Airport uses "on the stack", token based dependency injection
+                        to allow for seamless framework upgrades on each device. However this
+                        type of injection is non-standard and can throw schema developers off
+                        (as something unfamiliar and therefore unnatural). With introduction of
+                        isolates adding more tranditional constructor based dependency injection
+                        scheme becomes possible.
+                        <h2>Why "on the stack"?</h2>
+                        Airport has it's own unique dependency injection system.  It's adoption
+                        was driven by the fact that Airport will run in non-controlled 
+                        environments - end user devices.  On top of that it can have any number
+                        of Apps access it (locally) at any given point in time (either
+                        via user interaction or in the background).  In such environments
+                        performing framework upgrades becomes tricky - App's CRUD calls will
+                        not work while the upgrade is happenning.  And depending now how the
+                        apps are written this can (and most probably will) lead to broken user
+                        experiences.  Being an upcoming framework Airport can risk being deleted
+                        from User's devices if they are frustrated by possibly frequent outages
+                        of service (realistically, the rate of bug fixes at the beginning will be
+                        high).
+                        <br>
+                        <br>
+                        Enter the typeless, on the stack dependency injection.  Unlike constructor
+                        based injection it allows to keep the non-upgraded classes the same after
+                        the upgrade, with only the upgraded classes being reloaded in the VM.  This
+                        is combined with "request caching" during the upgrade process, which creates
+                        a small time-window during which no active requests are going though the
+                        system.  Together they allow Airport to catch all incoming requests
+                        and delay their execution while a fast upgrade is happening (a few classes
+                        being quickly replaced on the fly) and then continue with serving those same
+                        requests as if nothing has happened.  All while the user if completely 
+                        oblivious to the fact that a bug has just been fixed.
+                        <br>
+                        <br>
+                        This makes for a much smoother user experience, which could make or break
+                        Airport at the beginning, right when it will have to be patched frequently.
+                        The user will be able to access the ungrade log, in case they
+                        are curious or concerned with code being upgraded without their knowledge.
+                        Eventually a setting can be added that will prompt the user for upgrades.
+                        But this also makes for a more clunky developer experience.  Every method
+                        that uses other injectable objects now has to inject them explicitly (or
+                        have them passed in via the execution context).  Also the injection will
+                        feel unnatural to the fast majority of developers because it uses tokens.
+
+                        <h2>Isolate schemas are different</h2>
+                        
+                        With the introduction of V8 isolates schema developers can now write code
+                        that will be executable in a sandbox environment.  This will expose the
+                        "unnatural" nature of Airports current injection system and can become
+                        a barrier to developer adoption.
+                        <br>
+                        <br>
+                        The cool thing about isloate sandboxes is that upgrading them can be done
+                        wholesale, or at least the 3rd party schema code, which will be deployed
+                        via a separate bundle. Under the covers (in DAO superclasses) it will use
+                        Airport IOC tokens to access the rest of the framework.  All of the
+                        requests coming to a schema isolate and to the core framework from
+                        the schema isolate can be cached while the 3rd party bundle is loaded.
+                        To make it all work, all API endpoint classes will also have Airport IOC
+                        tokens (not exposed to the developer) so that they can be (re)loaded at
+                        run time.
+                        
+                        <h2>Angular style</h2>
+
+                        The new dependency injection system will utilize the Angular style
+                        @Injectable() decorators on the injectable classes.  And the fact that
+                        schemas are written in Typescript allows to determine types of
+                        constructor parameters at build time and generate a library-wide
+                        descriptor that keep track of which objects to inject where.
+
+                        <h2>Client bundle</h2>
+                        All Airport schemas provide a thin client bundle that allows to call
+                        into the schemas.  With the new approach stub objects will be generated
+                        for all API classes of the schema that will contain API method
+                        declarations (which will call into Airport).  The application developers
+                        can either instantiate these objects via standard "new Constructor()"
+                        calls or extend these objects and inject them into a dependency
+                        injection framework of their choice.
+
+                        <h2>Happy, happy, joy joy!</h2>
+                        This new approach makes me happy (personally) since I no longer have
+                        to worry about explaining do developers token based injection or
+                        about how exactly to split client-side tokens from the rest of schema
+                        tokens.  Hopefully this also will make the developers happy as
+                        they should be right at home this with way of injecting dependencies. 
+                    </div> <!-- end entry content -->
+
+                </article> <!-- end column large-full entry-->
+
+
+                <div class="comments-wrap">
+                </div> <!-- end comment-respond -->
+
+            </main>
+
+        </div> <!-- end s-content -->
+
+
+        <!-- footer
+    ================================================== -->
+        <footer class="s-footer footer">
+        </footer>
+
+    </div> <!-- end s-wrap -->
+
+
+    <!-- Java Script
+================================================== -->
+    <script src="../js/post-component-loader.js"></script>
+    <script src="../js/jquery-3.2.1.min.js"></script>
+    <script src="../js/plugins.js"></script>
+    <script src="../js/main.js"></script>
+
+</body>

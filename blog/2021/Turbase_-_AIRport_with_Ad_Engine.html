@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html class="no-js" lang="en">
+
+<head>
+
+    <!--- basic page needs
+    ================================================== -->
+    <meta charset="utf-8">
+    <title>AIRport Blog</title>
+    <meta name="description" content="The solution for natural Dao logic">
+    <meta name="author" content="Artem V Shamsutdinov">
+
+    <!-- mobile specific metas
+    ================================================== -->
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- CSS
+    ================================================== -->
+    <link rel="stylesheet" href="../css/base.css">
+    <link rel="stylesheet" href="../css/vendor.css">
+    <link rel="stylesheet" href="../css/main.css">
+
+    <!-- script
+    ================================================== -->
+    <script src="../js/modernizr.js"></script>
+
+    <!-- favicons
+    ================================================== -->
+    <link rel="apple-touch-icon" sizes="180x180" href="../apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="../favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
+    <link rel="manifest" href="../site.webmanifest">
+
+</head>
+
+<body class="ss-bg-white">
+
+    <!-- preloader
+================================================== -->
+    <div id="preloader">
+        <div id="loader" class="dots-fade">
+            <div></div>
+            <div></div>
+            <div></div>
+        </div>
+    </div>
+
+    <div id="top" class="s-wrap site-wrapper">
+
+        <!-- site header
+    ================================================== -->
+        <header class="s-header header">
+        </header> <!-- end s-header -->
+
+
+        <!-- site content
+    ================================================== -->
+        <div class="s-content content">
+            <main class="row content__page">
+
+                <article class="column large-full entry format-standard">
+
+                    <div class="media-wrap entry__media">
+                        <div class="entry__post-thumb">
+                            <img alt="First Light Fusion Two-Stage Hyper-Velocity Gas Gun" sizes="(max-width: 1000px) 100vw, 1000px"
+                                src="images/first-light-fusion-2-stage-gas-gun.webp">
+                            <p style="text-align: center; width: 100%">
+                                <a href="https://firstlightfusion.com/">First Light Fusion</a> has built its 
+                                <a href="https://firstlightfusion.com/media-archive/first-light-fusion-installs-uks-biggest-two-stage-hyper-velocity-gas-gun/">Two-Stage Hyper-Velocity Gas Gun</a></p>
+                        </div>
+                    </div>
+
+                    <div class="content__page-header entry__header">
+                        <h1 class="display-1 entry__title">
+                            Turbase - AIRport with Advertisement Engine
+                        </h1>
+                        <ul class="entry__header-meta">
+                            <li class="author">By Artem V. Shamsutdinov</li>
+                            <li class="date">September 3rd, 2021</li>
+                        </ul>
+                    </div> <!-- end entry__header -->
+
+                    <div class="entry__content">
+                        <p>For a while now AIRport has been the brand for the AIR technology.  And also for quite some time 
+                            we've been dicussing building an adverisement engine on top of AIRport to generate revenue that
+                            can be shared with Apps and users.  Now finally I've come up with a good enough of a brand for the
+                            actual App that will be installed on phones and other devices - Turbase.
+                        </p>
+                        <br>
+                        <img alt="Turbase logo" src="../../images/turbase/turbase-logo.png">
+                        <br>
+                        <p>
+                            The Advertisement Engine is a natural fit for Turbase.  Since AIRport already stores user data locally
+on the device it makes sense to use that data for figuring out what Ads the user would like to see.
+One thing that is unique to Turbase is that it allows to do so without sharing user data with any
+central authority or the advertisers.  They key is to provide a separation between the user data with
+a dedicated Ad engine, and the advertisement platform that works with Advertisers to gather and serve
+Ads.
+                        </p>
+                        <h2>Local Ad Engine</h2>
+                        <p>
+                            To make that work Turbase makes a determination what Ad should be shown locally on the device.  That
+decision is based on the data that is being
+requested by the Application and additional metadata that is provided by the App.  Then Turbase sends
+a network request to an Advertisement Platform to request specific Ads.  The Ad Platform will expose
+a query engine that Trubase apps can use to request specific adds based on a category-like search. The
+important thing is that this Ad lookup is done
+without giving up any of the information about the user, or what data is being rendered on the
+page the user seeing or even what App their are using.
+                        </p>
+                        <h2>Revenue Sharing</h2>
+                        <p>
+                            The key part of Turbase Ad Engine is that it will share advertisement revenue between the the adverisement
+platform, the Turbase App, the App the user is using and the user themselves.  A sharing balance
+will be achieved to keep all of the parties interested.  Users will be interested in providing
+demographic data about themselves, which will stay on the device for the use by the local Ad Engine.
+Client Apps will be intested
+in proving meaningful metadata about the content that is being shown to the user.  And the
+advertisement platform is interested in serving ads to devices without collecting user data
+to cut costs and to generate good will.
+                        </p>
+                        <h2>Still to come</h2>
+                        <p>
+                            The development on the Ad Engine has not yet started - we'll need to secure additional funding
+to get it underway.  The exact way we'll be doing has not yet been determined.  At first it will
+start out as a set of simple queries to determine in a very primitive way what type of Ads should
+be shown.  Subsequenly, as more people are involved in its development, we'll add statistical 
+modeling and AI.
+                        </p>
+                    </div> <!-- end entry content -->
+
+                </article> <!-- end column large-full entry-->
+
+
+                <div class="comments-wrap">
+                </div> <!-- end comment-respond -->
+
+            </main>
+
+        </div> <!-- end s-content -->
+
+
+        <!-- footer
+    ================================================== -->
+        <footer class="s-footer footer">
+        </footer>
+
+    </div> <!-- end s-wrap -->
+
+
+    <!-- Java Script
+================================================== -->
+    <script src="../js/post-component-loader.js"></script>
+    <script src="../js/jquery-3.2.1.min.js"></script>
+    <script src="../js/plugins.js"></script>
+    <script src="../js/main.js"></script>
+
+</body>

@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html class="no-js" lang="en">
+<head>
+
+    <!--- basic page needs
+    ================================================== -->
+    <meta charset="utf-8">
+    <title>AIRport Blog</title>
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <!-- mobile specific metas
+    ================================================== -->
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- CSS
+    ================================================== -->
+    <link rel="stylesheet" href="../css/base.css">
+    <link rel="stylesheet" href="../css/vendor.css">
+    <link rel="stylesheet" href="../css/main.css">
+
+    <!-- script
+    ================================================== -->
+    <script src="../js/modernizr.js"></script>
+
+    <!-- favicons
+    ================================================== -->
+    <link rel="apple-touch-icon" sizes="180x180" href="../apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="../favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
+    <link rel="manifest" href="../site.webmanifest">
+
+</head>
+
+<body class="ss-bg-white">
+
+<!-- preloader
+================================================== -->
+<div id="preloader">
+    <div id="loader" class="dots-fade">
+        <div></div>
+        <div></div>
+        <div></div>
+    </div>
+</div>
+
+<div id="top" class="s-wrap site-wrapper">
+
+    <!-- site header
+    ================================================== -->
+    <header class="s-header header">
+    </header> <!-- end s-header -->
+
+
+    <!-- site content
+    ================================================== -->
+    <div class="s-content content">
+        <main class="row content__page">
+
+            <article class="column large-full entry format-standard">
+
+                <div class="media-wrap entry__media">
+                    <div class="entry__post-thumb">
+                        <img
+                                alt="A view of Cordova, Spain"
+                                sizes="(max-width: 2000px) 100vw, 2000px"
+                                src="images/Edinburgh_Scotland.jpg"
+                        >
+                    </div>
+                </div>
+
+                <div class="content__page-header entry__header">
+                    <h1 class="display-1 entry__title">
+                        Verifying Persistence
+                    </h1>
+                    <ul class="entry__header-meta">
+                        <li class="author">By Artem V. Shamsutdinov</li>
+                        <li class="date">Early 2020</li>
+                    </ul>
+                </div> <!-- end entry__header -->
+
+                <div class="entry__content">
+                    <p>
+                        The first (to be) Airport application
+                        <a href="https://votecube.com">Votecube</a> was originally written with
+                        <a href="https://cloud.google.com/firestore">Firestore</a> as the backend.
+                        While it's own central backend will be moved from Firebase to another
+                        solution, writing it with that technology exposed me to its
+                        <a href="https://firebase.google.com/docs/firestore/security/get-started">Security
+                            Rules</a>.
+                    </p>
+
+                    <p>These rules are in place because by default Firebase is accessed from
+                        a client browser. Hence there need to be a special set of rules that
+                        had to exist which would validate the newly entered data. After some time
+                        I was able to translate some of these concepts into Airport.</p>
+
+                    <p>First of all, basic data format validation (type, size) is already
+                        covered by JPA annotations. On top of that all User/Agent information can
+                        also be easily verified. Basically if the record is being created then the
+                        user information cannot be passed in (it is automatically filled in by
+                        Airport). Same goes for creation and update timestamps - these are tracked
+                        internally by the modification history (which is mandatory in Airport).
+                        And if a record is being referenced then it's easy to always verify that
+                        the Id it is referenced by exists in the local database. If it doesn't
+                        then
+                        how was it referenced from the local client (and used for persistence)
+                        in the first place?</p>
+
+                    <p>
+                        However one important part was missing from the spec: Given an object
+                        graph
+                        passed into create/update/save operation which parts of it should be
+                        created
+                        and or referenced at all?
+                    </p>
+
+                    <p>
+                        The perfect way to describe these relations is a JSON tree, not unlike the
+                        one used in the entity select statement. Given the following two entities:
+                    </p>
+
+                    <pre><code>@Entity()
+<b>export class</b> Parent {
+
+    @Id()
+    @GeneratedValue()
+    key: <b>number</b>;
+
+    value: <b>string</b>;
+
+    @OneToMany({cascade: CascadeType.DELETE, mappedBy: 'parent'})
+    children: Child<[];
+}
+
+@Entity()
+<b>export class</b> Child {
+
+    @Id()
+    @GeneratedValue()
+    key: <b>number</b>;
+
+    value: <b>string</b>;
+
+    @ManyToOne()
+    parent: Parent;
+}</code></pre>
+                    <p>
+                        It is then possible to construct such trees with ease:
+                    </p>
+                    <pre><code><b>export class</b> ParentDao <b>extends</b> BaseParentDao {
+
+    @Persist&lt;ParentGraph&gt;({
+        value: Y,
+        child: [{
+            value: Y
+        }, ANOTHER(0, 2)] || null
+    })
+    <b>static</b> createWithChildren = this.create;
+}
+
+<b>export class</b> ChildDao <b>extends</b> BaseChildDao {
+
+    @Persist&lt;ChildGraph&gt;({
+        value: Y,
+        parent: {
+            id: Y
+        }
+    })
+    <b>static</b> createWithParentReference = this.create;
+}</code></pre>
+
+                    <p>
+                        Note that because the @Persist decorators are processed at build time
+                        they:
+                    </p>
+                    <ul>
+                        <li>Allow to specify OR conditions and allow for alternative data shapes
+                        </li>
+                        <li>Allow to specify exactly how many records are expected in an input
+                            array
+                        </li>
+                        <li>Allow to specify a range of how many input records are expected</li>
+                        <li>Remove overhead to the client schema library - all information is
+                            in package.json and is loaded by Airport framework directly
+                        </li>
+                        <li>The methods themselves do not need to be specified, only assigned the
+                            core operation. They are then assigned an id (based on name) which is
+                            used to look up the matching persistence graph.
+                        </li>
+                    </ul>
+
+                    <p>
+                        With this modification in place the cascade rules for persist operations
+                        become obsolete. They are now needed only for delete operations. And for
+                        now
+                        the only way to perform a delete on an entity is to pass an object (or a
+                        stub
+                        with its ID) to be deleted. Then the framework will then traverse the
+                        cascade rules and delete everything (that is stored locally) accordingly.
+                        Of
+                        course one can still write a manual delete query with a where clause (that
+                        will also delete only the matching local records).
+                    </p>
+                </div> <!-- end entry content -->
+
+            </article> <!-- end column large-full entry-->
+
+
+            <div class="comments-wrap">
+            </div> <!-- end comment-respond -->
+
+        </main>
+
+    </div> <!-- end s-content -->
+
+
+    <!-- footer
+    ================================================== -->
+    <footer class="s-footer footer">
+    </footer>
+
+</div> <!-- end s-wrap -->
+
+
+<!-- Java Script
+================================================== -->
+<script src="../js/post-component-loader.js"></script>
+<script src="../js/jquery-3.2.1.min.js"></script>
+<script src="../js/plugins.js"></script>
+<script src="../js/main.js"></script>
+
+</body>

@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html class="no-js" lang="en">
+<head>
+
+    <!--- basic page needs
+    ================================================== -->
+    <meta charset="utf-8">
+    <title>AIRport Blog</title>
+    <meta name="description" content="The solution for natural Dao logic">
+    <meta name="author" content="Artem V Shamsutdinov">
+
+    <!-- mobile specific metas
+    ================================================== -->
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- CSS
+    ================================================== -->
+    <link rel="stylesheet" href="../css/base.css">
+    <link rel="stylesheet" href="../css/vendor.css">
+    <link rel="stylesheet" href="../css/main.css">
+
+    <!-- script
+    ================================================== -->
+    <script src="../js/modernizr.js"></script>
+
+    <!-- favicons
+    ================================================== -->
+    <link rel="apple-touch-icon" sizes="180x180" href="../apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="../favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
+    <link rel="manifest" href="../site.webmanifest">
+
+</head>
+
+<body class="ss-bg-white">
+
+<!-- preloader
+================================================== -->
+<div id="preloader">
+    <div id="loader" class="dots-fade">
+        <div></div>
+        <div></div>
+        <div></div>
+    </div>
+</div>
+
+<div id="top" class="s-wrap site-wrapper">
+
+    <!-- site header
+    ================================================== -->
+    <header class="s-header header">
+    </header> <!-- end s-header -->
+
+
+    <!-- site content
+    ================================================== -->
+    <div class="s-content content">
+        <main class="row content__page">
+
+            <article class="column large-full entry format-standard">
+
+                <div class="media-wrap entry__media">
+                    <div class="entry__post-thumb">
+                        <img
+                                alt="Construction of ITER fusion reactor is nearing it's completion"
+                                sizes="(max-width: 1000px) 100vw, 1000px"
+                                src="images/ITER_top.jpg"
+                        >
+                        <p style="text-align: center; width: 100%">Construction of the <a href="https://www.iter.org/">ITER</a> project is nearing it's completion</p>
+                    </div>
+                </div>
+
+                <div class="content__page-header entry__header">
+                    <h1 class="display-1 entry__title">
+                        To boldly Go and isolate
+                    </h1>
+                    <ul class="entry__header-meta">
+                        <li class="author">By Artem V. Shamsutdinov</li>
+                        <li class="date">August 7th, 2021</li>
+                    </ul>
+                </div> <!-- end entry__header -->
+
+                <div class="entry__content">
+                    <h2>The solution to natural DAO logic</h2>
+                    <p>For quite a while now I've been dreading having to write Firebase-like rules
+                        for mutation logic.  I have a number of reservations about writing a custom
+                        syntax engine:
+                    </p>
+                    <ul>
+                        <li>
+                        Developers have to learn yet another domain specific language
+                        </li>
+                        <li>
+                        It will be more limited than TypeScript
+                        </li>
+                        <li>
+                        It would take time to write and get right
+                        </li>
+                    </ul>
+                    <p>
+                        So, I've been searching for a way to run server side DAOs.  Based on what
+                        I found all JavaScript sandboxes (apparently there are only a couple of them
+                         out there) are both slow and can be compromized.  So after initial surge
+                         of excitement I had to give up on an easy way sandbox JavaScript.  Yet
+                         the idea of just running DAO logic to do server-side validation and server
+                         side transactions was just too natural and convenient to give up on so I
+                         finally determined that I would write an engine that would take parsed TypeScript,
+                         serialized the AST to JSON and another engine that would take that AST and
+                         re-generate JavaScript on the server side and do an "eval" call to re-construct
+                         safe DAO logic on the server-side.  Of course this solution would 
+                         (at least initially) be very limited in the syntax it would support and would
+                         take a bunch of time to write and get right (just like the Firebase-like rule
+                         engine, though probably a bit simpler).
+                    </p>
+                    <p>
+                        Then during a design review at my day-time contract Golang came up and I
+                        was joyfully explaining how easy it is to learn and use.  A couple
+                        of days later it hit me (thank God): Shouldn't I be able
+                        to run the V8 engine isolates and should Go (being compiled to binary) be
+                        runnable on mobile platforms, just like SqLite can be run in Cordova? Well,
+                        it turns out that the hard work of making it possible has already been done:
+                    </p>
+                    <ul>
+                        <li><a href="https://github.com/rogchap/v8go">GoLang V8 integration</a></li>
+                        <li><a href="https://github.com/golang/mobile">GoLang mobile integraion</a></li>
+                        <li><a href="https://github.com/mattn/go-sqlite3">GoLang SqLite integration</a></li>
+                    </ul>
+                    <p>
+                        Having these 3 projects, along with a
+                        <a href="https://github.com/valyala/fasthttp">fast GoLang web server</a> makes
+                        writing a mobile app that uses <a href="https://v8.dev/docs/embed">V8 Isolates</a>
+                        feasible for me (last time I used C was in a Scientific Computing course about 20
+                        years ago).
+                    </p>
+                    <h2>JavaScript isolation in Browser</h2>
+                    <p>
+                        One of the goals of AIRport is to provide a zero-install environment for user
+                        trial.  This is the main reason why it's written it TypeScript (it can run
+                        entirely in Web Browser, with either WebSql or SqlJs).  So it took a bit more
+                        thinking that DAO isolation can be done in the browser with cross-domain 
+                        iframes.  The main AIRport frame will contain one child frame for every
+                        schema.  The child frame will run on a different domain than the main frame
+                        and won't be able to call main framework code directly (only via postMessage).
+                    </p>
+                    <h2>The future is bright</h2>
+                    <p>
+                        Anyway, I'm very exited about where the DAO code will be headed with these fundings.
+                        Essentially this means that the developers are now free to write whatever logic
+                        the choose to see fit (and include whatever libraries they need for processing).
+                        This make possible to write reusable server-side domain logic, which will allow
+                        to reuse much more than the underlying schema and further simplifies writting
+                        specialies add-on apps (while giving the original application creator more
+                        assurances about their work being used properly).
+                    </p>
+                </div> <!-- end entry content -->
+
+            </article> <!-- end column large-full entry-->
+
+
+            <div class="comments-wrap">
+            </div> <!-- end comment-respond -->
+
+        </main>
+
+    </div> <!-- end s-content -->
+
+
+    <!-- footer
+    ================================================== -->
+    <footer class="s-footer footer">
+    </footer>
+
+</div> <!-- end s-wrap -->
+
+
+<!-- Java Script
+================================================== -->
+<script src="../js/post-component-loader.js"></script>
+<script src="../js/jquery-3.2.1.min.js"></script>
+<script src="../js/plugins.js"></script>
+<script src="../js/main.js"></script>
+
+</body>

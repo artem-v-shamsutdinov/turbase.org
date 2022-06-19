@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html class="no-js" lang="en">
+
+<head>
+
+    <!--- basic page needs
+    ================================================== -->
+    <meta charset="utf-8">
+    <title>AIRport Blog</title>
+    <meta name="description" content="Application Interoperability">
+    <meta name="author" content="Artem V Shamsutdinov">
+
+    <!-- mobile specific metas
+    ================================================== -->
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- CSS
+    ================================================== -->
+    <link rel="stylesheet" href="../css/base.css">
+    <link rel="stylesheet" href="../css/vendor.css">
+    <link rel="stylesheet" href="../css/main.css">
+
+    <!-- script
+    ================================================== -->
+    <script src="../js/modernizr.js"></script>
+
+    <!-- favicons
+    ================================================== -->
+    <link rel="apple-touch-icon" sizes="180x180" href="../apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="../favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
+    <link rel="manifest" href="../site.webmanifest">
+
+</head>
+
+<body class="ss-bg-white">
+
+    <!-- preloader
+================================================== -->
+    <div id="preloader">
+        <div id="loader" class="dots-fade">
+            <div></div>
+            <div></div>
+            <div></div>
+        </div>
+    </div>
+
+    <div id="top" class="s-wrap site-wrapper">
+
+        <!-- site header
+    ================================================== -->
+        <header class="s-header header">
+        </header> <!-- end s-header -->
+
+
+        <!-- site content
+    ================================================== -->
+        <div class="s-content content">
+            <main class="row content__page">
+
+                <article class="column large-full entry format-standard">
+
+                    <div class="media-wrap entry__media">
+                        <div class="entry__post-thumb">
+                            <img alt="Unmagnetized implosion image and magnetized image - showing that the applied magnetic field flattens the implosion shape. Credit: Bose et al."
+                                sizes="(max-width: 1000px) 100vw, 1000px"
+                                src="images/magnetizing-laser-driven-inertial-fusion-implosions.jpeg">
+                            <p style="text-align: center; width: 100%">
+                                Researches from MIT and other universities have
+                                <a
+                                    href="https://phys.org/news/2022-06-magnetizing-laser-driven-inertial-fusion-implosions.html">
+                                    demonstrated
+                                </a> that strong magnetic fields flatten the shape of inertial fusion implosions.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="content__page-header entry__header">
+                        <h1 class="display-1 entry__title">
+                            AIR UuId
+                        </h1>
+                        <ul class="entry__header-meta">
+                            <li class="author">By Artem V. Shamsutdinov</li>
+                            <li class="date">June 15th, 2022</li>
+                        </ul>
+                    </div> <!-- end entry__header -->
+
+                    <div class="entry__content">
+                        <p>
+
+                            Working with raw AIRport ids is cumbersome. The reason for that is the fact
+                            that an Id of an entity is spread across 3 different entities:
+                        </p>
+                        <pre><code>MyEntity {
+    actor: {
+        // backed by a foreign key column in MyEntity
+        id: 123
+    },
+    actorRecordId: 456,
+    repository: {
+        // backed by a foreign key column in MyEntity
+        id: 789
+    }
+}</code></pre>
+
+                        <h2>UUIDs</h2>
+                        <p>
+                            Moreover the ids are local to the AIR database and can differ between AIRport
+                            databases. Globally the records are identified by UuIds for Repository
+                            and Actor (in combination with actorRecordId). To get uuIds you have to join
+                            to the Actor and Repository tables:
+                        </p>
+                        <pre><code>MyEntity {
+    actor: {
+        // Exists only in 
+        uuId: '123e4567-e89b-12d3-a456-426614174000'
+    },
+    actorRecordId: 456,
+    repository: {
+        uuId: 'IPFS-QmcRD4wkPPi6dig81r5sLj9Zm1gDCL4zgpEj9CfuRrGbzF'
+    },
+}</code></pre>
+
+                        <h3 id="performance">Performance</h3>
+                        <p>
+                            AIRport UUIDs are strings that are at least 90 characters long (and will
+                            probably average 92 characters in most cases):
+                        </p>
+                        <pre><code>IPFS-QmcRD4wkPPi6dig81r5sLj9Zm1gDCL4zgpEj9CfuRrGbzF-123e4567-e89b-12d3-a456-426614174000-123</code></pre>
+                        <p>
+
+                            Reason for pulling out UuIds out of records is space savings. There
+                            are 4 UuIds to store - Actor UuId, Repository UuId, Original Actor UuId
+                            and Original Repository UuId (with originals neccessarily populated for
+                            cross-repository queries). This adds up to 368 bytes per record. On top of
+                            that you have to add space for indexes for each one of these. With that it
+                            can come close 1K per record or more, depending on number of foreign keys
+                            and indexes.
+                        </p>
+                        <p>
+                            Modern phones have plenty of storage space (latest IPhone models at the time
+                            of writing of this blog post come with at least 128GB of storage). However
+                            AIRport can also run in browser where it runs an SqlJs instance in memory. This
+                            is where the difference really matters. If web AIRport has 10 repositories
+                            loaded with just 1000 records each the UuIds alone will take up 5MB worth of RAM.
+                            As of 2022 IPhone 14s will come with 6GB or RAM (only). And, since there is no
+                            way to tell how much data users will keep in web AIRports or how long living web
+                            AIRport instances will be, every byte matters.
+                        </p>
+                        <p>
+                            For this reason I'm still keeping UuIds normalized in their own tables and
+                            require joining to these tables to retrieve them. Of course joining more tables
+                            in queries has a negative impact on performace as well, but Actor and Repository
+                            are much smaller tables (especially on Mobile devices) and impact is minimal.
+                        </p>
+                        <h2>Usability</h2>
+                        <p>
+                            But the main issue with raw AIRport UuIds is usability. Not only do you have
+                            to include the related entities in queries but you also have to properly query
+                            them, which can be very error prone. On top of that, if you want to use these
+                            ids as part of a link you now have to manually compose them into a single string
+                            and decompose them at query time.
+                        </p>
+                        <h2>New whole "UuId"</h2>
+                        <p>
+                            For this reason from now on all Repository Entities now include a transient "UuId" field:
+                        </p>
+                        <pre><code>@MappedSuperclass()
+<b>export class</b> AirEntity {
+
+    ....
+
+    @Transient()
+    uuId: <b>string</b>
+
+}</code></pre>
+                        <p>
+                            This field is implemented with a getter/setter pair. These are defined when
+                            the record is recieved from the framework (by either an AIRport App or anything that
+                            invokes APIs).
+                        </p>
+                        <p>
+                            All the getter does is grab the uuids and the actorRecordId and concatenate them
+                            into one large uuId:
+                        </p>
+                        <pre><code>'IPFS-QmcRD4wkPPi6dig81r5sLj9Zm1gDCL4zgpEj9CfuRrGbzF-123e4567-e89b-12d3-a456-426614174000-123'</code></pre>
+
+                        <h2>Automatic Retrieval</h2>
+                        <p>
+                            Prior to addition of uuId field querying for it required joining the Repository
+                            and Actor entities:
+                        </p>
+                        <pre><code><b>export class</b> MyRecordDao {
+
+    <b>async</b> findMyRecordsWithNestedRecords() {
+        <b>let</b> m: QMyRecord
+        <b>return await this</b>._find({
+            select: {
+                '*': Y,
+                repository: {
+                    uuId: Y
+                },
+                actor: {
+                    uuId: Y
+                }
+                nested: {}
+            },
+            from: [
+                m = Q.MyRecord,
+                m.repository.innerJoin(),
+                m.actor.innerJoin()
+            ]
+        })
+    }
+}</code></pre>
+                        <p>
+                            Now you can query by the "uuId" field directly, without having to explicitly
+                            specify the related select clause framents and joins.
+                            While the "uuId" field is @Transient an exception is made in its case and it
+                            can be used for querying (just like peristent fields):
+                        </p>
+                        <pre><code><b>export class</b> MyDao {
+
+    <b>async</b> findMyRecordsWithNestedRecords() {
+        <b>return await this</b>._find({
+            select: {
+                '*': Y,
+                uuId: Y,
+                nested: {}
+            }
+        })
+    }
+}</code></pre>
+                        <p>
+                            Note that it is not included with all of the persisted records in '*' and
+                            must be specified explicitly in the query to be retrieved.
+                        </p>
+                        <h2>Easier Queries</h2>
+                        <p>
+                            To make querying "by uuId" easier Dao also includes the "findByUuId" method
+                            which takes the composite UuId, and automatically constructs the necessary
+                            join to query the record.
+                        </p>
+                        <p>
+                            For easy querying in joins all Query entites now include
+                            an "equals" and "in" methods that allow for joining by the composite UuId
+                            (or just joining to another entity by a Query Object or actual object
+                            references).
+                        </p>
+                        <pre><code><b>export class</b> MyDao {
+
+    <b>async</b> myFind(
+        compositeBUuId: <b>string</b>,
+        compositeCUuIds: <b>string</b>[],
+    ): PromiseMyRecord[]> {
+        <b>let</b> m: QMyRecord,
+            b: QMyBRecord,
+            c: QMyCRecord
+        <b>return await this</b>._find({
+            select: {
+                '*': Y,
+                uuId: Y,
+                b: {
+                    '*': Y,
+                    'c': {}
+                }
+            },
+            from: [
+                m = Q.MyRecord,
+                b = m.b.leftJoin(),
+                c = b.c.leftJoin()
+            ],
+            where: and(
+                // equals on the query entity object
+                b.equals(compositeBUuId),
+                // in on the query entity object
+                c.in(compositeCUuIds)
+            )
+        })
+    }
+}</code></pre>
+                        <h2>Final effect</h2>
+                        <p>
+                            Putting in this tooling makes AIRport UUID scheme much more
+                            developer friendly. The Application developer now work with
+                            the 'uuId' field directly and don't have interface with the
+                            underlying support table structure.
+                        </p>
+                    </div> <!-- end entry content -->
+
+                </article> <!-- end column large-full entry-->
+
+                <div class="comments-wrap">
+                </div> <!-- end comment-respond -->
+
+            </main>
+
+        </div> <!-- end s-content -->
+
+
+        <!-- footer
+================================================== -->
+        <footer class="s-footer footer">
+        </footer>
+
+    </div> <!-- end s-wrap -->
+
+
+    <!-- Java Script
+================================================== -->
+    <script src="../js/post-component-loader.js"></script>
+    <script src="../js/jquery-3.2.1.min.js"></script>
+    <script src="../js/plugins.js"></script>
+    <script src="../js/main.js"></script>
+
+</body>

@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html class="no-js" lang="en">
+<head>
+
+    <!--- basic page needs
+    ================================================== -->
+    <meta charset="utf-8">
+    <title>AIRport Blog</title>
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <!-- mobile specific metas
+    ================================================== -->
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- CSS
+    ================================================== -->
+    <link rel="stylesheet" href="../css/base.css">
+    <link rel="stylesheet" href="../css/vendor.css">
+    <link rel="stylesheet" href="../css/main.css">
+
+    <!-- script
+    ================================================== -->
+    <script src="../js/modernizr.js"></script>
+
+    <!-- favicons
+    ================================================== -->
+    <link rel="apple-touch-icon" sizes="180x180" href="../apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="../favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
+    <link rel="manifest" href="../site.webmanifest">
+
+</head>
+
+<body class="ss-bg-white">
+
+<!-- preloader
+================================================== -->
+<div id="preloader">
+    <div id="loader" class="dots-fade">
+        <div></div>
+        <div></div>
+        <div></div>
+    </div>
+</div>
+
+<div id="top" class="s-wrap site-wrapper">
+
+    <!-- site header
+    ================================================== -->
+    <header class="s-header header">
+    </header> <!-- end s-header -->
+
+
+    <!-- site content
+    ================================================== -->
+    <div class="s-content content">
+        <main class="row content__page">
+
+            <article class="column large-full entry format-standard">
+
+                <div class="media-wrap entry__media">
+                    <div class="entry__post-thumb">
+                        <img
+                                alt="A view of a road, with Singapore in the background"
+                                sizes="(max-width: 1000px) 100vw, 1000px"
+                                src="images/Singapore-Skyline-Empty-Road.jpg"
+                        >
+                    </div>
+                </div>
+
+                <div class="content__page-header entry__header">
+                    <h1 class="display-1 entry__title">
+                        Highway - The Beginning
+                    </h1>
+                    <ul class="entry__header-meta">
+                        <li class="author">By Artem V. Shamsutdinov</li>
+                        <li class="date">Jan 15th, 2021</li>
+                    </ul>
+                </div> <!-- end entry__header -->
+
+                <div class="entry__content">
+                    <p>I haven't head as much time as I have hoped to develop Highway last year.
+                        So during the beginning of this year I'm focusing on
+                        developing a prototype product based on Highway and developing
+                        Highway itself in the process.</p>
+                    <h2>Motivation behind Highway</h2>
+                    <p>
+                        As Airport applications will be developed it will be beneficial to
+                        store some of the data of that application centrally. For example
+                        a scheduling app might contain your own, family or group schedule
+                        as well as schedules for public events. Highway is intended to
+                        provide an implementation of the central storage solution behind
+                        the same exact API as Airport will be using locally. With it you
+                        would be using a single query definition to retrieve the data
+                        from both the local AIR database as well as from a central
+                        server. Likewise a single update statement would be used
+                        to update either the local AIR database or a central storage
+                        solution or both.
+                    </p>
+                    <h2>The Technical Challenge</h2>
+                    <p>
+                        The trick with Highway is that past a certain scale serving
+                        centrally located data from a relational database becomes
+                        inefficient and just too expensive. There are other
+                        technologies out there that the job of scaling a web app
+                        much cheaper. Specifically full text search engines have
+                        been developed to efficiently retrieve data based on a
+                        free text query and document database have been developed
+                        to very efficiently retrieve data based on an Id or some
+                        other normalized querying means.
+                    </p>
+                    <p>The core insight that Highway utilizes (and attempts to
+                        prove in the process) is that it should be possible to
+                        declaratively map relational fields to fields or documents in
+                        non-relational storage engines (or not fully relational
+                        storage engines) and have the system automatically forward
+                        qualifying queries to the right engines and automatically
+                        update non-relational engines as the relational data
+                        gets updated. And to do so in a performant and distributed
+                        way.</p>
+                    <h2>The approach</h2>
+                    <p>For my initial implementation I've chosen
+                        <a href="https://vespa.ai/">Vespa</a>
+                        and
+                        <a href="https://www.scylladb.com/">ScyllaDb</a>
+                        as the initial non-relational platforms to
+                        implement Highway with. The idea for Highway
+                        is to be flexible enough to incorporate just about
+                        any kind of storage system into the mix. It will do
+                        so by taking a technology specific set of decorators
+                        and utilities and converting them into an internal,
+                        implementation agnostic notation, which it will then
+                        interpret at runtime and perform the required query and
+                        data maintenance operations.</p>
+                    <p>Highway will also attempt to off-load as much computation
+                        as possible to build-time, thereby arriving a very efficient
+                        set of instructions that in needs to perform at run time
+                        do do the necessary work.</p>
+                    <p>Also at build-time Highway will provide a report of
+                        which queries are being served from which storage engines and
+                        which <a href="../2020/Transactionality.html">save/delete</a>
+                        calls update them. It will also warn if there are queries
+                        still being served from the relational db (if they haven't
+                        specifically been marked as such) and also warn if there
+                        are non-sql defined entities/documents that are not being maintained
+                        but are being read from.</p>
+                    <p>Finally Highway will provide hooks into the system
+                        which will allow developers to add additional processing
+                        at any stage of the process. I've done some preliminary
+                        research and have chosen
+                        <a href="https://node-ts.github.io/bus/">@node-ts/bus</a>
+                        as the distributed application platform for that reason.</p>
+                    <p>Please stay tuned for specific examples as I start to
+                        implement them... :)</p>
+                </div> <!-- end entry content -->
+
+            </article> <!-- end column large-full entry-->
+
+
+            <div class="comments-wrap">
+            </div> <!-- end comment-respond -->
+
+        </main>
+
+    </div> <!-- end s-content -->
+
+
+    <!-- footer
+    ================================================== -->
+    <footer class="s-footer footer">
+    </footer>
+
+</div> <!-- end s-wrap -->
+
+
+<!-- Java Script
+================================================== -->
+<script src="../js/post-component-loader.js"></script>
+<script src="../js/jquery-3.2.1.min.js"></script>
+<script src="../js/plugins.js"></script>
+<script src="../js/main.js"></script>
+
+</body>

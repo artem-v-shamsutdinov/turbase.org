@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html class="no-js" lang="en">
+
+<head>
+
+    <!--- basic page needs
+    ================================================== -->
+    <meta charset="utf-8">
+    <title>AIRport Blog</title>
+    <meta name="description" content="The solution for natural Dao logic">
+    <meta name="author" content="Artem V Shamsutdinov">
+
+    <!-- mobile specific metas
+    ================================================== -->
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- CSS
+    ================================================== -->
+    <link rel="stylesheet" href="../css/base.css">
+    <link rel="stylesheet" href="../css/vendor.css">
+    <link rel="stylesheet" href="../css/main.css">
+
+    <!-- script
+    ================================================== -->
+    <script src="../js/modernizr.js"></script>
+
+    <!-- favicons
+    ================================================== -->
+    <link rel="apple-touch-icon" sizes="180x180" href="../apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="../favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
+    <link rel="manifest" href="../site.webmanifest">
+
+</head>
+
+<body class="ss-bg-white">
+
+    <!-- preloader
+================================================== -->
+    <div id="preloader">
+        <div id="loader" class="dots-fade">
+            <div></div>
+            <div></div>
+            <div></div>
+        </div>
+    </div>
+
+    <div id="top" class="s-wrap site-wrapper">
+
+        <!-- site header
+    ================================================== -->
+        <header class="s-header header">
+        </header> <!-- end s-header -->
+
+
+        <!-- site content
+    ================================================== -->
+        <div class="s-content content">
+            <main class="row content__page">
+
+                <article class="column large-full entry format-standard">
+
+                    <div class="media-wrap entry__media">
+                        <div class="entry__post-thumb">
+                            <img alt="Artificial Sun tokamak reactor in China" sizes="(max-width: 1000px) 100vw, 1000px"
+                                src="images/first-light-fusion-2-stage-gas-gun.webp">
+                            <p style="text-align: center; width: 100%"><a href="https://firstlightfusion.com/">First
+                                    Light Fusion</a> completes its two-stage gas gun</p>
+                        </div>
+                    </div>
+
+                    <div class="content__page-header entry__header">
+                        <h1 class="display-1 entry__title">
+                            Solidifying Interop
+                        </h1>
+                        <ul class="entry__header-meta">
+                            <li class="author">By Artem V. Shamsutdinov</li>
+                            <li class="date">August 19th, 2022</li>
+                        </ul>
+                    </div> <!-- end entry__header -->
+
+                    <div class="entry__content">
+                        <h2>Authentic schema & logic</h2>
+                        <p>
+                            Because the schema library code is signed by the private key
+                            of it's creator, schema code can easily be proven to be
+                            authentic. The only external requirement is the schema creator's
+                            public key placed in a predetermined path of their website. If
+                            the signature matches then AIRport knows that the specified
+                            schema came from the correct domain, the same domain that the
+                            user can check for the features of the application and make
+                            the determination of installing the schema in the first place.
+                        </p>
+                        <h2>Enabling validation</h2>
+
+                        <p>With the realization that the logic in isloates
+                            means locally-run vetted components comes the problem of
+                            validating And, with the save
+                            operation cascading defined an even more important problem
+                            of cross schema joins becomes apparent. Here is my first take
+                            on how it can be solved (along with the first take on schema
+                            permissions).
+                        </p>
+                        <p>
+                            Besides basic assurance having of authentic schemas this also
+                            enables schema creators to provide access rules for their
+                            schemas. My initial thoughts are that schema creators can
+                            specify while and black lists for what schemas from other
+                            domains can access. A new "accessRules" directory under "src"
+                            will be provided for that purpose. The creators will place
+                            access rules classes under it which will have something like
+                            the following:
+                        </p>
+                        <pre><code>
+@BuildTime()
+<b>class</b> AccessRules
+        <b>extends</b> BaseAccessRules {
+                            
+    <b>constructor</b>(
+        <b>private</b> daoA: DaoA,
+        <b>private</b> daoB: DaoB,
+        <b>private</b> apiA: ApiA,
+        <b>private</b> apiB: ApiB
+    ) {
+        <b>super</b>()
+    }
+                            
+    wideOpenRule = this.accessRule({
+        operations: [
+            this.apiA.operationA
+        ],
+        whitelist: [{
+            domain: '*'
+        }, {
+            external: true
+        }]
+    })
+                            
+    whitelistRule = this.accessRule({
+        operations: [
+            this.daoA.nestedQuery,
+            this.daoB.deepSave,
+            this.apiB.operationB
+        ],
+        whitelist: [{
+                domain: 'adomain.com',
+                schemas: [
+                    'aschema',
+                    'bschema'
+                ]
+            }, {
+                domain: 'bdomain.com'
+            }]
+    })
+                            
+    blacklistRule = this.accessRule({
+        operations: [
+            this.all
+        ],
+        blacklist: [{
+            domain: 'cdomain.com'
+        }]
+    })
+                            
+}
+                    </code></pre>
+                        <p>
+                            In the above rules ApiA.operationA is opened to all other protected logic
+                            domains and to all external calls. DaoA.nestedQuery and DaoB.nestedSave
+                            ApiB.operationB are opened to 'aschema' and 'bschema' of 'adomain.com',
+                            and for all schemas 'bdomain.com'
+                        </p>
+                        <p>
+                            These access rules will be parsed a build time and will be converted into
+                            a JSON definition that will be read by the core framework at runtime.
+                            This is because for schema interoperability
+                            Notice that these rules reference already defined operations. These may be
+                            <br>
+                            The above case illustrates the most basic save API - a Parent object with any combination
+                            of properties, values and child objects will be accepted (as long as they pass the
+                            schema validation rules of the database).
+                            <br>
+                            But let's say the schema developer wants to do some structural and basic value validation
+                            on the passed in entities. Well a declarative way to do so appears to be the most
+                            natural (and most readable) choice.
+                        </p>
+                        <pre><code>
+<b>export class</b> ParentDao extends BaseParentDao {
+
+    @Api()
+    @ParentDao.Save({
+        key: Y,
+        value: Y
+    })
+    saveChildless;
+
+    @Api()
+    @ParentDao.Save({
+        key: Y,
+        value: Y,
+        children: [{
+            key: Y,
+            value: Y
+        }]
+    })
+    saveWithChildren;
+
+}
+                    </code></pre>
+                        <p>
+                            In the above example there are two distinct APIs, one accepts Parent entity by itself only
+                            and the other accepts Parent entity with children. These are very easy to read and
+                            understand
+                            and make perfect sense at a glance. However, they are limited in functionality and
+                            saveWithChildren is a bit ambiguous - will it work if no children objects are passed in?
+                            More functionality can be added to these structural rules, but at a cost of some
+                            readability:
+                        </p>
+
+                        <pre><code>
+<b>export class</b> ParentDao extends BaseParentDao {
+
+    @Api()
+    @ParentDao.Save({
+        key: Y,
+        value: 'A'
+    })
+    saveChildless;
+
+    @Api()
+    @ParentDao.Save({
+        key: Y,
+        value: 'A' || 'B',
+        children: [{
+            key: Y,
+            value: null || 'A' || 'B'
+        }, some(0, 2, {
+            key: Y,
+            value: 'C' || 'D'
+        }), any(2)] || null
+    })
+    saveWithChildren;
+
+}
+                    </code></pre>
+
+                        <p>
+                            The above example is very precise in what values and child objects it will accept,
+                            even declaring a range on the number of child objects and specifying that no child
+                            objects is also OK for saveWithChildren. But this comes at a cost of having to support
+                            the logical OR (||) operator as well as a static invocation of functions. But
+                            more importantly it is now harder to read and takes some effort to understand
+                            (makes sense logically but is a mix of declarations and code).
+                            <br>
+                            Moreover, the schema developer can take over and manually specify additional validation
+                            (that just can't be easily described in a simple, declarative manner):
+                        </p>
+
+                        <pre><code>
+<b>export class</b> ParentDao extends BaseParentDao {
+
+    @Api()
+    @ParentDao.Save({
+        key: Y,
+        value: 'A'
+    })
+    <b>async</b> saveChildless(
+        nonParent: Parent
+    ):Promise&lt;number&gt; {
+        // Additional logic here
+        <b>return await</b> this.save(nonParent);
+    }
+
+    @Api()
+    @ParentDao.Save({
+        key: Y,
+        value: 'A' || 'B',
+        children: [{
+            key: Y,
+            value: null || 'A' || 'B'
+        }, {
+            key: Y,
+            value: 'C' || 'D'
+        }, any(2)] || null
+    })
+    <b>async</b> saveWithChildren(
+        parents: Parents[]
+    ):Promise&lt;number&gt; {
+        // Additional logic here
+        <b>return await</b> this.save(parents);
+    }
+
+}
+                    </code></pre>
+                        <p>
+                            Finally, the schema developer may decide to completely lock down their API
+                            and provide a custom API that does not expose the Dao.save call:
+                        </p>
+
+
+                        <pre><code>
+<b>export class</b> CustomApi {
+
+    @Api()
+    <b>async</b> saveChildless(
+        nonParent: Parent
+    ):Promise&lt;number&gt; {
+        // Custom process logic
+        const parentDao = await container(this).get(PARENT_DAO);
+        <b>return await</b> parentDao.saveChildless(nonParent);
+    }
+
+    @Api()
+    <b>async</b> saveWithChildren(
+        parents: Parents[]
+    ):Promise&lt;number&gt; {
+        // Custom process logic
+        const parentDao = await container(this).get(PARENT_DAO);
+        <b>return await</b> parentDao.saveWithChildren(parents);
+    }
+
+}
+
+<b>export class</b> ParentDao extends BaseParentDao {
+
+    @Api()
+    @ParentDao.Save({
+        key: Y,
+        value: 'A'
+    })
+    <b>async</b> saveChildless(
+        p: Parent
+    ):Promise&lt;number&gt; {
+        // Additional logic here
+        <b>return await</b> this.save(parent);
+    }
+
+    @Api()
+    @ParentDao.Save({
+        key: Y,
+        value: 'A' || 'B',
+        children: [{
+            key: Y,
+            value: null || 'A' || 'B'
+        }, {
+            key: Y,
+            value: 'C' || 'D'
+        }, any(2)] || null
+    })
+    <b>async</b> saveWithChildren(
+        p: Parents[]
+    ):Promise&lt;number&gt; {
+        // Additional logic here
+        <b>return await</b> this.save(parent);
+    }
+
+}
+DI.set(PARENT_DAO, ParentDao);
+                    </code></pre>
+                        <h2>Controlling cross-schema persistence</h2>
+                        <p>
+                            This scheme enables a fine-grained control over cross-schema persistence
+                            of the objects via either exposing or hiding .save access. If .save is exposed
+                            via @Api() then another schema can use it automatically. When it's entities are
+                            saved, any entities from other schemas that are passed in object graph
+                            will also be saved, assuming that the other schema's .save validation rules
+                            pass. If no .save calls are exposed then the developers another schema will
+                            be forced to use the CustomApi in a @Transactional() context
+                        </p>
+
+                        <h2>@Transactional() is back</h2>
+                        <p>This reminds me to mention something that I missed in the last post, with
+                            custom schema logic @Transactional() methods are back. This means that it's
+                            very natural and simple to make complex transactions that might not only
+                            do .save calls but also embedded queries, inserts, updates and deletes.</p>
+
+                        <h2>Remembering the old schema</h2>
+                        <p>
+                            The above also allows for more natural schema upgrades
+                            The basic concept behind new schema upgrades is that new versions
+                            of the schema can (voluntarily) retain .save APIs form previous versions of
+                            the schema, but with new adjustment logic that coverts the old entity format
+                            to the new schema. This allows Apps that are using
+                            older versions of the schema to still function (for example during a deprecation
+                            period). Also, this keeps the framework simple and gives schema developers the choice
+                            (and the responsibility) of either maintaining or not maintaining backward
+                            compatibility for their schemas, across as many versions as they see fit. They
+                            should be motivated by the fact that they are monetarily rewarded when their
+                            schema is used and maintain backward compatibility indefinitely.
+                            <br>
+                            <br>
+                            To make this work AIRport will now retain older versions of the generated
+                            entity APIs in special sub-folders of the src/generated folder. So,
+                            for Parent, along with normal IParent there will also be IParent_1_0_0,
+                            IParent_2_0_0 and so on - one file for each version of the schema.
+                            This does bloat the project but not the run-time code since these are just
+                            interfaces.
+                            <br>
+                            <br>
+                            This, of course, does not solve the problem of other schemas having queries
+                            that join against older versions of the tables. To fix this a new
+                            src/views directory will be provided with 1_0_0, 2_0_0 (and so on) sub-folders
+                            each of these sub-folders will contain logic that will maintain views
+                            of older versions of the tables so that they may be used by other schemas
+                            that have not yet upgraded.
+                        </p>
+                        <h2>Naturally migrating data</h2>
+                        <p>
+                            Lastly, having custom executable logic allows for very natural data
+                            migration code to be written as part of the regular schema code. A new
+                            src/dataMigration folder will be provided for that purpose, with 2_0_0,
+                            3_0_0 (and so on) sub-folders. Each of these sub-folders will contain
+                            the logic necessary to migrate data in existing schemas versions to new
+                            versions, as well as to the DDL to add/remove columns, tables, indexes
+                            and views. But that is a topic for future discussion ...
+                        </p>
+
+                    </div> <!-- end entry content -->
+
+                </article> <!-- end column large-full entry-->
+
+
+                <div class="comments-wrap">
+                </div> <!-- end comment-respond -->
+
+            </main>
+
+        </div> <!-- end s-content -->
+
+
+        <!-- footer
+    ================================================== -->
+        <footer class="s-footer footer">
+        </footer>
+
+    </div> <!-- end s-wrap -->
+
+
+    <!-- Java Script
+================================================== -->
+    <script src="../js/post-component-loader.js"></script>
+    <script src="../js/jquery-3.2.1.min.js"></script>
+    <script src="../js/plugins.js"></script>
+    <script src="../js/main.js"></script>
+
+</body>

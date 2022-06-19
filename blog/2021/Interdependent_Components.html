@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html class="no-js" lang="en">
+
+<head>
+
+    <!--- basic page needs
+    ================================================== -->
+    <meta charset="utf-8">
+    <title>AIRport Blog</title>
+    <meta name="description" content="The solution for natural Dao logic">
+    <meta name="author" content="Artem V Shamsutdinov">
+
+    <!-- mobile specific metas
+    ================================================== -->
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- CSS
+    ================================================== -->
+    <link rel="stylesheet" href="../css/base.css">
+    <link rel="stylesheet" href="../css/vendor.css">
+    <link rel="stylesheet" href="../css/main.css">
+
+    <!-- script
+    ================================================== -->
+    <script src="../js/modernizr.js"></script>
+
+    <!-- favicons
+    ================================================== -->
+    <link rel="apple-touch-icon" sizes="180x180" href="../apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="../favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
+    <link rel="manifest" href="../site.webmanifest">
+
+</head>
+
+<body class="ss-bg-white">
+
+    <!-- preloader
+================================================== -->
+    <div id="preloader">
+        <div id="loader" class="dots-fade">
+            <div></div>
+            <div></div>
+            <div></div>
+        </div>
+    </div>
+
+    <div id="top" class="s-wrap site-wrapper">
+
+        <!-- site header
+    ================================================== -->
+        <header class="s-header header">
+        </header> <!-- end s-header -->
+
+
+        <!-- site content
+    ================================================== -->
+        <div class="s-content content">
+            <main class="row content__page">
+
+                <article class="column large-full entry format-standard">
+
+                    <div class="media-wrap entry__media">
+                        <div class="entry__post-thumb">
+                            <img alt="Tokamak Energy's ST40 reactor" sizes="(max-width: 1000px) 100vw, 1000px"
+                                src="images/Tokamak_Energy_reactor.jpg">
+                            <p style="text-align: center; width: 100%">
+                                <a href="https://www.tokamakenergy.co.uk/">Tokamak Enery</a> is helping to get to first 
+                                <a href="https://www.nature.com/articles/d41586-021-02203-4">fusion power plants by 2030s</a></p>
+                        </div>
+                    </div>
+
+                    <div class="content__page-header entry__header">
+                        <h1 class="display-1 entry__title">
+                            Interdependent Components
+                        </h1>
+                        <ul class="entry__header-meta">
+                            <li class="author">By Artem V. Shamsutdinov</li>
+                            <li class="date">September 1st, 2021</li>
+                        </ul>
+                    </div> <!-- end entry__header -->
+
+                    <div class="entry__content">
+                        <p>I've now come to a full realization of what logic in isloates
+                            mean - locally-run vetted components.  This trully changes
+                            the way AIRport applications can be written. Apps are no
+                            longer required to maintain expensive (to most people on
+                            the planet) server side components. Also that allows for a
+                            degree of independent developer specialization that is already
+                            standard among most professional programmers and UI designers. 
+                        </p>
+                        <h2>Any component not just schema</h2>
+                        <p>
+                            A few days ago it hit me - logic running in V8 isolates does
+                            not necesarily need to be tied to schemas. It can just as
+                            easily be logic that uses other schemas, without providing
+                            its own. And it can even be logic that does not use any
+                            schemas directly and only uses other components. Or, even 
+                            using no components at all, itself being a core library used
+                            by others.
+                        </p>
+                        <h2>Serverless components and apps</h2>
+                        <p>
+                            This opens the door to an even greater degree of composability
+                            and reusability of AIRport components. Different components
+                            can slice and dice the data in different ways to arrive at
+                            different result types, meant for any number of different
+                            purposes. They can join together any number of schemas in
+                            any number ways leading to an invinite number of possibilites
+                            for how data is combined and used. This was also possible
+                            before but the logic running those schemas could not be
+                            vetted without relying on external public keys and checking
+                            the signature of evey request, and therefore a necessary
+                            backend component for evey app to sign those requests.
+                        </p>
+                        <p>
+                            Now component authenticily can be verified without any server
+                            side components. The libraries themselves can be signed at
+                            developement time and the public key can be provided as a
+                            resource on a static page (backed by decetralized technologies
+                            like IPFS and Arweave). This reduces the maintenance
+                            costs of complex "relation database based" Apps down to an
+                            annual domain registration fee and one time payment (as is the
+                            case with Arweave) for application deployment.  This trully
+                            lowing the barrier for entry into app development to anybody
+                            on the planet that can code, no matter what part of the world
+                            they live in and how much money they have.  Even the 
+                            maintenance of a domain name isn't required, as long as the
+                            developer doesn't need it for their branding.
+                        </p>
+                        <h3>Division of labor</h3>
+                        <p>
+                            What'seven more exiting is that business (and other complex)
+                            logic is no longer driven to the outside apps where it would
+                            be bundled with UIs. With the V8 isolates complex logic can
+                            now be provided without any UIs and external UIs can now come
+                            without any complex logic. 
+                        </p>
+                        <p>
+                            This allows even smaller groups of developers or even 
+                            individuals to contribute to the ecosystem and realize 
+                            monetary gains from it. From personal experience I know that 
+                            as a backend developer it took me years of practice to get 
+                            proficient at building good UIs (let alone at designing 
+                            them I still float). With vetted logic in Airport, a really
+                            good backend developer can focus on writing very useful
+                            components and not worry about having to bundle a UI (that
+                            they aren't necessarily used to writing). While a web designer
+                            can now design a very good UI and plug it into the components
+                            written by the above mentioned back-end developer. And all
+                            without requiring a larger organization that would have to keep
+                            both them on staff and purse goal related more to money making
+                            than creativity.  Now both of them can create functional
+                            product and fully utilize their creative potential as
+                            unconstrained, independent actors.
+                        </p>
+                        <p>
+                            This effect greatly increases the number of developers that
+                            can productively contribute to the AIRport echosystem while
+                            remaining idependent. One no longer has to be good at 
+                            everything and therefore can be better at more focused tasks.
+                            Even within back-end programming there can be a division of
+                            labor since logic can now be split up into a greater number
+                            of cooperating components.  This was a main goal of AIRport
+                            from the begging - democratization of application development
+                            (while keeping data independent).
+                        </p>
+                        <p>
+                            Of course with this approach a way of monetizing the efforts
+                            of all developers (schema, logic, UI) will have to be devised.
+                            The good thing is that with crypto currency splitting up micro
+                            payments becomes much easier. The trick will be in determining
+                            the value of each of the components relative to each other,
+                            as the revenue is being split among them. Different users
+                            can gain different quantity value from different components so
+                            it will probably have to be done dynamically and separately on
+                            each member device. The time for this functionality has not
+                            yet come ...
+                        </p>
+                    </div> <!-- end entry content -->
+
+                </article> <!-- end column large-full entry-->
+
+
+                <div class="comments-wrap">
+                </div> <!-- end comment-respond -->
+
+            </main>
+
+        </div> <!-- end s-content -->
+
+
+        <!-- footer
+    ================================================== -->
+        <footer class="s-footer footer">
+        </footer>
+
+    </div> <!-- end s-wrap -->
+
+
+    <!-- Java Script
+================================================== -->
+    <script src="../js/post-component-loader.js"></script>
+    <script src="../js/jquery-3.2.1.min.js"></script>
+    <script src="../js/plugins.js"></script>
+    <script src="../js/main.js"></script>
+
+</body>
