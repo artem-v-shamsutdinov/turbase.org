@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html class="no-js" lang="en">
+
+<head>
+
+    <!--- basic page needs
+    ================================================== -->
+    <meta charset="utf-8">
+    <title>AIRport Blog</title>
+    <meta name="description" content="The solution for natural Dao logic">
+    <meta name="author" content="Artem V Shamsutdinov">
+
+    <!-- mobile specific metas
+    ================================================== -->
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- CSS
+    ================================================== -->
+    <link rel="stylesheet" href="../css/base.css">
+    <link rel="stylesheet" href="../css/vendor.css">
+    <link rel="stylesheet" href="../css/main.css">
+
+    <!-- script
+    ================================================== -->
+    <script src="../js/modernizr.js"></script>
+
+    <!-- favicons
+    ================================================== -->
+    <link rel="apple-touch-icon" sizes="180x180" href="../apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="../favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
+    <link rel="manifest" href="../site.webmanifest">
+
+</head>
+
+<body class="ss-bg-white">
+
+    <!-- preloader
+================================================== -->
+    <div id="preloader">
+        <div id="loader" class="dots-fade">
+            <div></div>
+            <div></div>
+            <div></div>
+        </div>
+    </div>
+
+    <div id="top" class="s-wrap site-wrapper">
+
+        <!-- site header
+    ================================================== -->
+        <header class="s-header header">
+        </header> <!-- end s-header -->
+
+
+        <!-- site content
+    ================================================== -->
+        <div class="s-content content">
+            <main class="row content__page">
+
+                <article class="column large-full entry format-standard">
+
+                    <div class="media-wrap entry__media">
+                        <div class="entry__post-thumb">
+                            <img alt="MIT in collaboration with Commonwealth Fusion Systems created a 20 Tesla magnet"
+                                sizes="(max-width: 1000px) 100vw, 1000px" src="images/National_Ignition_Facility.jpg">
+                            <p style="text-align: center; width: 100%">
+                                with <a href="https://lasers.llnl.gov/">National Ignition Facility</a> has
+                                <a
+                                    href="https://www.llnl.gov/news/national-ignition-facility-experiment-puts-researchers-threshold-fusion-ignition">
+                                    achieved
+                                </a> Q 0.7 - 70% break even on power output with lasers.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="content__page-header entry__header">
+                        <h1 class="display-1 entry__title">
+                            Everything as Repository
+                        </h1>
+                        <ul class="entry__header-meta">
+                            <li class="author">By Artem V. Shamsutdinov</li>
+                            <li class="date">September 29th, 2021</li>
+                        </ul>
+                    </div> <!-- end entry__header -->
+
+                    <div class="entry__content">
+                        Unlike JPA/Hibernate, AIRport entity management is sessionless. The way
+                        it accomplishes change detection is via
+                        <a
+                            href="https://autonomousinterdependentrepositories.wordpress.com/2019/09/06/entity-management/">
+                            original values</a>
+                        tracking in a hidden object property. Recently I've been debugging
+                        Insert vs Update detection and realized that everything is easier with
+                        Ids that are generated. If the Id is present in the input it cannot
+                        be an Insert. That got me thinking - should all entities be forced
+                        to have generated Ids?
+                        <h2>Repository Entities - always generated Ids</h2>
+                        Well, repository entities already have generated repository + Actor
+                        specific repository Ids (each AIRport database acts as a unique actor for
+                        a repository and hence it's auto-generated sequences are guaranteed
+                        to be unique in a given repository for that Actor/database). Hence,
+                        my next natural thought was - can all data in the database be
+                        in repositories?
+                        <h2>"Non-repository" data</h2>
+                        Prior thought was that there was bound to be maintenance data
+                        that wouldn't be tracked in user repositories and bundled with
+                        the schema instead. Existance of such data is almost a certaintly.
+                        Examples of such data are dropdown values, and other lookup data.
+                        <h2>Everything is better in Repositories</h2>
+                        Putting such data into repositories still works. In fact it makes
+                        maintainance of such data much easier. Now data-only patches are
+                        as easy as modifying data in the one of these publisher controlled
+                        repositories.
+                        <br>
+                        Another thing this decoupling of code from data does is that it
+                        allows entities other than publishers of the code provide different
+                        seed data. This helps a lot of the application is a data driven,
+                        generic piece of logic, meant to be customized/skinned based on
+                        different data that users (or publishers of other apps) can
+                        provide.
+                        <br>
+                        Even the original maintenance-data repository can be allowed to
+                        be modified and enhanced by users or can be published with
+                        read-only public facing permissions, or can be completely hidden
+                        from the rest of the world (other than the application itself).
+                        But more on that once the repository code is actually finished...
+                        <h2>Technical details</h2>
+                        Another piece of information that hasn't been fully thought out
+                        until now is how exactly will Repositories with references to
+                        other Repositories exist in the database if the referenced
+                        repositories are not yet present in the database. The original
+                        thought was to disable all foreign key constraints on all tables
+                        and just have dangling references to non-existing records.
+                        However this suffers from schema denormalization since
+                        relations are no longer enforced.
+                        <br>
+                        The new way is to just to disallow NON NULL columns for everything
+                        except record ids. This is also a form of denormalization but
+                        at least it doesn't compromise relationship integrity. What it
+                        does do is allow for is create stub records in the database, to keep
+                        track of missing repository records. This is because such records
+                        can exist with nothing but Id columns filled out (because
+                        all other columns are NULL).
+                        <br>
+                        This can be taken a step further with in-code maintenance of NON
+                        NULL constraints. That way NON NULL can still exist (virtually)
+                        for normal data and will simply be ignored for stub records.
+                        <h2>Still to come</h2>
+                        The initial Repository implementation will be taking place very
+                        soon and more details will be releaved as a result of that, stay
+                        tuned ...
+
+                    </div> <!-- end entry content -->
+
+                </article> <!-- end column large-full entry-->
+
+
+
+
+                <div class="comments-wrap">
+                </div> <!-- end comment-respond -->
+
+            </main>
+
+        </div> <!-- end s-content -->
+
+
+        <!-- footer
+    ================================================== -->
+        <footer class="s-footer footer">
+        </footer>
+
+    </div> <!-- end s-wrap -->
+
+
+    <!-- Java Script
+================================================== -->
+    <script src="../js/post-component-loader.js"></script>
+    <script src="../js/jquery-3.2.1.min.js"></script>
+    <script src="../js/plugins.js"></script>
+    <script src="../js/main.js"></script>
+
+</body>

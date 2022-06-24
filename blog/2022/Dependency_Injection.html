@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html class="no-js" lang="en">
+
+<head>
+
+    <!--- basic page needs
+    ================================================== -->
+    <meta charset="utf-8">
+    <title>AIRport Blog</title>
+    <meta name="description" content="Application Dependency Injection">
+    <meta name="author" content="Artem V Shamsutdinov">
+
+    <!-- mobile specific metas
+    ================================================== -->
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- CSS
+    ================================================== -->
+    <link rel="stylesheet" href="../css/base.css">
+    <link rel="stylesheet" href="../css/vendor.css">
+    <link rel="stylesheet" href="../css/main.css">
+
+    <!-- script
+    ================================================== -->
+    <script src="../js/modernizr.js"></script>
+
+    <!-- favicons
+    ================================================== -->
+    <link rel="apple-touch-icon" sizes="180x180" href="../apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="../favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
+    <link rel="manifest" href="../site.webmanifest">
+
+</head>
+
+<body class="ss-bg-white">
+
+    <!-- preloader
+================================================== -->
+    <div id="preloader">
+        <div id="loader" class="dots-fade">
+            <div></div>
+            <div></div>
+            <div></div>
+        </div>
+    </div>
+
+    <div id="top" class="s-wrap site-wrapper">
+
+        <!-- site header
+    ================================================== -->
+        <header class="s-header header">
+        </header> <!-- end s-header -->
+
+
+        <!-- site content
+    ================================================== -->
+        <div class="s-content content">
+            <main class="row content__page">
+
+                <article class="column large-full entry format-standard">
+
+                    <div class="media-wrap entry__media">
+                        <div class="entry__post-thumb">
+                            <img alt="Joint European Torus"
+                                sizes="(max-width: 1000px) 100vw, 1000px" src="images/Joint_European_Torus.jpg">
+                            <p style="text-align: center; width: 100%">
+                                The <a>Joint European Torus</a> (JET) more than doubled the amount of fusion energy produced in a single “shot” – breaking the 1997 record.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="content__page-header entry__header">
+                        <h1 class="display-1 entry__title">
+                            Dependency Injection
+                        </h1>
+                        <ul class="entry__header-meta">
+                            <li class="author">By Artem V. Shamsutdinov</li>
+                            <li class="date">Aprl 21st, 2022</li>
+                        </ul>
+                    </div> <!-- end entry__header -->
+
+                    <div class="entry__content">
+                        <p>
+                            A key factor in Turbase (and thus AIRport) adoption will be the ease of
+                            writing applications. One key feature that needs to be done in a
+                            developer friendly way is Dependency Injection.
+                        </p>
+                        <h2>Current Implementation</h2>
+                        <p>
+                            Internal AIRport dependency injection is done "on the stack", with tokens.
+                            First there is a library level tokens.ts file that defines dependency
+                            injection tokens for a library:
+                        </p>
+                        <pre><code><b>import</b> {domain} <b>from</b> '@airport/di'
+<b>import</b> {IMyClass} <b>from</b> './MyClass'
+<b>import</b> {IMyOtherClass} <b>from</b> './MyOtherClass'
+
+<b>const</b> airport = domain('air')
+<b>const</b> myLibrary = airport.lib('myLibrary')
+
+<b>const</b> MY_CLASS = myLibrary.token&lt;IMyClass&gt;('MY_CLASS')
+<b>const</b> MY_OTHER_CLASS = myLibrary.token&lt;IMyOtherClass&gt;('MY_OTHER_CLASS')</code></pre>
+                        <p>
+                            Each injectable class is defined in its own file (with it's interface)
+                            sometimes being defined in the same file.
+                        </p>
+                        <pre><code><b>import</b> { container, DI} <b>from</b> '@airport/di'
+<b>import</b> { MY_CLASS, MY_OTHER_CLASS } <b>from</b> './tokens'
+
+<b>export interface</b> IMyClass {
+
+    myMethod(): Promise&lt;void&gt;
+
+}
+
+<b>export class</b> MyClass <b>implements</b> IMyClass {
+
+    myMethod(): Promise&lt;void&gt; {
+        const myOtherClass = await container(this).get(MY_OTHER_CLASS)
+
+        await myOtherClass.myOtherMethod()
+    }
+
+}
+DI.set(MY_CLASS, MyClass)</code></pre>
+                        <p>
+                            This gives AIRport the ability to upgrade the framework and applications
+                            without having to reload them. AIRport may be running on a device for
+                            a long period of time. During that time patches may be made to AIRport.
+                            Critical patches will have be installed on the device AIRport runs on.
+                            Requiring a full reload of the framework or the running applications
+                            will necessarily consume battery power on the device and may be percieved
+                            as being very intrusive and inconvenient. With "on the stack" injection
+                            a patch with changed classes may be downloaded on to the devices and then
+                            executed via an additional script tag. That patch will simply re-register
+                            the changed classes with the dependency injection library. The DI library
+                            will then flip the switch to the new classes at the most opportune time (
+                            whenever there are no active transactions running on the system).
+                        </p>
+                        <p>
+                            Token based injection allows to accomplish that with relative ease while
+                            still allowing for typesafety (with each token specifying the interface
+                            of the class it retrieves).
+                        </p>
+                        <h2>Making it developer friendly</h2>
+                        <p>
+                            However it is not fair to make an average developer learn this specialized
+                            dependency injection system - even more things to learn and remember on top
+                            of learning a new framework. Thus, I've come up with a wrapper for this
+                            system, which makes dependency injection seamless.
+                        </p>
+                        <h3>Property injection</h3>
+                        <p>
+                            In AIRport token based injection is done on the stack.  That is
+                            dependencies get loaded only when they are accessed.  The main benefit
+                            of this approach is that it allows to replace a part of @Injectable()s
+                            without having to replace the objects they dependend on.  It also
+                            minimizes the risk of circular dependency lock between injected objects.
+                        </p>
+                        <p>
+                            Access to injected objects can be done via object properties and
+                            also done on the stack, at the same time.  This is because a property
+                            can be hidden behind a "get propertyName()" call. The new
+                            dependency injection wrapper works by automatically converting object
+                            properties which are annotated with @Inject() decorator. Here is what
+                            the above example looks like in the wrapped version:
+                        </p>
+
+                        <pre><code><b>import</b> { Inject } <b>from</b> '@airport/di'
+<b>import</b> { IMyOtherClass } <b>from</b> './MyOtherClass'
+
+<b>export interface</b> IMyClass {
+
+    myMethod(): Promise&lt;void&gt;
+
+}
+
+@Injectable()
+<b>class</b> MyClass <b>implements</b> IMyClass {
+
+    @Inject()
+    myOtherClass: IMyOtherClass
+
+    myMethod(): Promise&lt;void&gt; {
+        await myOtherClass.myOtherMethod()
+    }
+
+}</code></pre>
+                        <h2>How it works</h2>
+                        <p>
+                            @Injectable() decorator is now used to distinguish injectable classes from
+                            other classes.  @Api() classes are automatically injectable.  @Inject() 
+                            decorator is used to distinguish injected properties from other ones.
+                        </p>
+                        <p>
+                            Every AIRport application is already pre-processed to generate Query and Object
+                            interfaces from the DLL objects. This same process will now examine all of
+                            non-DDL and non-generated sources and create injection descriptors from them:
+                        </p>
+
+                        <pre><code><b>import</b> {domain} <b>from</b> '@airport/di'
+<b>import</b> {IMyClass, MyClass} <b>from</b> './MyClass'
+<b>import</b> {IMyOtherClass, MyOtherClass} <b>from</b> './MyOtherClass'
+
+<b>const</b> airport = domain('air')
+<b>const</b> myLibrary = airport.lib('myLibrary')
+
+<b>const</b> MY_CLASS = myLibrary.token&lt;IMyClass&gt;({
+    class: MyClass,
+    interface: 'IMyClass',
+    token: 'MY_CLASS'
+})
+<b>const</b> MY_OTHER_CLASS = myLibrary.token&lt;IMyOtherClass&gt;({
+    class: MyOtherClass,
+    interface: 'IMyOtherClass',
+    token: 'MY_OTHER_CLASS'
+})
+
+MY_CLASS.setDependencies({
+    myOtherClass: MY_OTHER_CLASS
+})</code></pre>
+                        <p>
+                            tokens.ts will now become generated by the system.  All class interfaces
+                            for @Inject()ed classes will also be generated (and won't have to
+                            be created manually).
+                        </p>
+                        <p>
+                            The token's descriptors will now keep track of it's dependencies.These will
+                            now be added to a JSON descriptor for that token (in tokens.ts).  That
+                            file will also allow the AIRport preprocessor to process dependencies from
+                            other projects.  
+                        </p>
+                        <p>
+                            When an object of a particular class is first retrieved by the dependency
+                            injection system, all of the properities defined in the 'setDepenencies'
+                            descriptor are replaced with getters that syncronously retrieve the needed
+                            dependency. A separate method (get${PROPERTY_NAME}Async) is also provided
+                            to retireve the dependency asyncronously, in case its retrieval needs to
+                            block while other resources load.  When that objects, getter/async method
+                            is called, the class is retrieved from the descriptor and instantiated.
+                        </p>
+                        <p>
+                            If a class has asyncronous initialization logic an "async initialize()"
+                            method must be defined in that class.  It is called only once per Class
+                            (see below for @Injectable() object pools).  If it has not been called
+                            yet and a syncronous getter is used the retrieve an object of that class,
+                            a runtime error is thrown.
+                        </p>
+                        <h2>
+                            Transaction tracking
+                        </h2>
+                        <p>
+                            I'm currently working on tracking transactions across applications and 
+                            another benefit that getter based dependency injection system brings is
+                            ability to track transactions.
+                        </p>
+                        <p>
+                            As described <a href="./Application_Interoperability.html">previously</a>
+                            transactions can run across multiple appilcations.  This means that
+                            (at least in environments that support multiple parallel transactions)
+                            for any given application, multiple transactions can be in-flight at
+                            any given point in time.  This means that an application must be able
+                            to pass the correct Transaction Id for every DAO.save call it performs.
+                            This in turn means that there must be tracking of what DAO calls are
+                            made from which @Api() invocation.
+                        </p>
+                        <h3>Why this Really matters</h3>
+                        <p>
+                            Support for multiple concurrent transactions is critical to AIRport
+                            adoption.  AIRport is meant to be run both on the client (for private
+                            data) and on the server (for shared data), with seamless integration.
+                            You write the code once and it automatically both works on SqLite
+                            in wasm and on CockroachDb with geographical sharding, while putting
+                            the read load on ScyllaDb and Vespa (or any other stack with
+                            additional adapters).  Ability to do this will allow for hybrid
+                            applications to quickly be written, and existing centralized
+                            applications will be able to to plugin and offer decentralization
+                            where it matters - for family and group user conversations and
+                            planning.
+                        </p>
+                        <h3>Injectable object pool</h3>
+                        <p>
+                            This can be accomplished by assigning a dedicated object (on an
+                            @Injectable() class) to a given @Api() call thread.  Every time a getter is invoked to
+                            retrieve an @Injectable() object that object is requested in the pool
+                            of objects of it's type, if there is a free one.  If there isn't, a new
+                            one is created and returned.
+                            </p>
+                            <p>
+
+                            The reason for creation of new instances of @Injectable() classes is to
+                            store "thread local" information in them.  The only other way to do it
+                            in client-side/browser JavaScript environment is
+                            to pass it though as an input parameter for all of the methods
+                            between the initial @Api() call and the internal DAO modification methods.
+                            Doing so is very strait forward and explains to the developers what is
+                            going on "under the hood" but places un-due burden of wiring in a context
+                            property that the developer has no need for.
+                        </p>
+                        <p>
+                            Having given it some thought I'm planning on keeping this manual
+                            option of passing Transaction ID in as an input parameter.  This
+                            option will documented an available for developers to use, if they choose
+                            to do so.
+                        </p>
+                        <p>
+                            However, for the bulk of the developers I'm expecting the "it magically works"
+                            method to be more useful (at least after they understand how it actually works).
+                        </p>
+                        <p> 
+                            In the convenient method of doing things, every @Injectable() object in the
+                            injection chain is created (or re-used from it's unused pool of objets)
+                            specifically for the purpose of serving that particular @Api() request.  This
+                            means that all of the state stored in these objects is scoped to that @Api()
+                            request and effectively acts as a "Thread Local" scope.  It is on that scope that
+                            the Transaction ID associated with the @Api() call is stored.  Once a database
+                            operation call is finally passed into the framework (to the framework adapter that
+                            is running in the App VM/Iframe) the framework accesses this state in the
+                            base DAO object (that is extended by the App's DAO objects). 
+                        </p>
+                        <h3>Additional uses of Request scoped @Injectables()</h3>
+                        <p>
+                            Currently all @Injectable() classes must be stateless.  This is because they might
+                            be swapped out for a newer version when a bug-fix patch is processed (again, as
+                            explained previously, reloading a couple of dozen iframes and loading all of their
+                            source as well as the source of the framework in the main frame could drain the
+                            device battery and can hinder AIRport adoption).
+                        </p>
+                        <p>
+                            Having Request scoped @Injectables() solves this issue.  Since AIRport Apps are
+                            already preprocessed all member state can be automatically put into a central store
+                            while providing instance variables as an API (via getters).  Also, @Request() and 
+                            @Session() scoped beans can be implemented on top of this.
+                        </p>
+                    </div> <!-- end entry content -->
+
+                </article> <!-- end column large-full entry-->
+
+                <div class="comments-wrap">
+                </div> <!-- end comment-respond -->
+
+            </main>
+
+        </div> <!-- end s-content -->
+
+
+        <!-- footer
+    ================================================== -->
+        <footer class="s-footer footer">
+        </footer>
+
+    </div> <!-- end s-wrap -->
+
+
+    <!-- Java Script
+================================================== -->
+    <script src="../js/post-component-loader.js"></script>
+    <script src="../js/jquery-3.2.1.min.js"></script>
+    <script src="../js/plugins.js"></script>
+    <script src="../js/main.js"></script>
+
+</body>

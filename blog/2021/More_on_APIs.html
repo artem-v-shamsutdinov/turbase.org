@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html class="no-js" lang="en">
+
+<head>
+
+    <!--- basic page needs
+    ================================================== -->
+    <meta charset="utf-8">
+    <title>AIRport Blog</title>
+    <meta name="description" content="The solution for natural Dao logic">
+    <meta name="author" content="Artem V Shamsutdinov">
+
+    <!-- mobile specific metas
+    ================================================== -->
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- CSS
+    ================================================== -->
+    <link rel="stylesheet" href="../css/base.css">
+    <link rel="stylesheet" href="../css/vendor.css">
+    <link rel="stylesheet" href="../css/main.css">
+
+    <!-- script
+    ================================================== -->
+    <script src="../js/modernizr.js"></script>
+
+    <!-- favicons
+    ================================================== -->
+    <link rel="apple-touch-icon" sizes="180x180" href="../apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="../favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
+    <link rel="manifest" href="../site.webmanifest">
+
+</head>
+
+<body class="ss-bg-white">
+
+    <!-- preloader
+================================================== -->
+    <div id="preloader">
+        <div id="loader" class="dots-fade">
+            <div></div>
+            <div></div>
+            <div></div>
+        </div>
+    </div>
+
+    <div id="top" class="s-wrap site-wrapper">
+
+        <!-- site header
+    ================================================== -->
+        <header class="s-header header">
+        </header> <!-- end s-header -->
+
+
+        <!-- site content
+    ================================================== -->
+        <div class="s-content content">
+            <main class="row content__page">
+
+                <article class="column large-full entry format-standard">
+
+                    <div class="media-wrap entry__media">
+                        <div class="entry__post-thumb">
+                            <img alt="Tokamak Energy developed a quench resistant magnet"
+                                sizes="(max-width: 1000px) 100vw, 1000px" src="images/Tokamak_Energy_quench_resistant_partially_insulated_magnet.jpg">
+                            <p style="text-align: center; width: 100%">
+                                <a href="https://www.tokamakenergy.co.uk/">Tokamak Energy</a> develops a
+                                <a
+                                    href="https://www.tokamakenergy.co.uk/next-generation-magnet-technology-paves-the-way-to-commercial-fusion-power/">
+                                    quench resistant magnet
+                                </a>.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="content__page-header entry__header">
+                        <h1 class="display-1 entry__title">
+                            More on APIs
+                        </h1>
+                        <ul class="entry__header-meta">
+                            <li class="author">By Artem V. Shamsutdinov</li>
+                            <li class="date">October 10th, 2021</li>
+                        </ul>
+                    </div> <!-- end entry__header -->
+
+                    <div class="entry__content">
+                        Recently I got the inital implementation of application isolates working
+                        (in browser only, without pulling application code from remote location)
+                        and as part of that did a pass on API implementations.
+
+                        <h2>Locking down APIs</h2>
+                        One thing that is likely be needed in the future is the ability to differentiate
+                        between "Application APIs" and "External APIs". An Application developer
+                        should be able to lock down APIs to be either other Application facing
+                        or External facing (like web UI, or anything else not running in an App
+                        isolate).
+                        <br>
+                        This can be accomplished by adding more precision to the @Api decorator:
+                        <code>
+                            <pre>
+@Injectable()
+<b>export class</b> AnApiClass {
+
+    @Api({ applications: true, external: true})
+    <b>async</b> anApi(): any {
+        ...
+    }        
+}
+                            </pre>
+                        </code>
+                        Current thinking is to leave the API wide open by default and allow the
+                        developers to lock it down as needed.
+
+                        <h2>AIRport path</h2>
+                        One of the tradeoffs that AIRport had to make is to give up some of
+                        the elegance when it comes to deleting records but instead not have
+                        to maintain a session.
+                        <br>
+                        I sent quite a bit of time developing with Hibernate (in Java world).
+                        It is a great piece of technology but one thing I never liked about
+                        it is the fact that entities can be attached and detached from the
+                        ORM session. For INSERTs vs UPDATEs AIRport
+                        <a
+                            href="https://autonomousinterdependentrepositories.wordpress.com/2019/09/06/entity-management/">
+                            got around this
+                        </a>
+                        by maintaing an __originalValues__ property on each object retrieved
+                        from the database and diffing it with the passed in values on the
+                        "save" operation. But DELETEs cannot be just as easily maintained.
+
+                        <h2>Ackward DELETEs</h2>
+                        The best I can come with for deletes so far is the following:
+                        <code>
+                            <pre>
+  /*
+   * Marks the object as deleted in 
+   */
+  markAsDeleted(record)
+
+  /*
+   * True if record is deleted, false otherwise
+   */
+  isDeleted(record)
+                            </pre>
+                        </code>
+                        This API allows the developers to explicitly mark a given
+                        object as deleted and also detect if an object has been
+                        marked as deleted.  This delete API is rather crude but
+                        purposely makes the "save" operation the segway for
+                        all entity based insert, update and delete operations (
+                        there is also no explicit update for entity API).  Of
+                        course the developers are always free to write explicit
+                        update and delete statements, expecially for bulk operations.
+
+                        <h3>Rare deletes</h3>
+                        It is worth noting that I don't exect deletes to be a
+                        common operation.  There really shouldn't be much
+                        reason to delete records, expecially since they can
+                        be split into time bound Repositories and archived
+                        when no longer actively needed.  On top of that in AIRport
+                        no data is really ever deleted since it is preseved in the
+                        transaction logs.  Hence I don't exect high usage for the
+                        delete operation, just lots of archiving.
+
+                        <h2>Locking down object state</h2>
+                        Thinking about deletes made me realize that one more API lockdown
+                        can be added to @Api - ability to pass in Object State.
+                        <br>
+                        Object state is what keeps track of if the object has been deleted or
+                        not and what the original values of the object were. It is possible
+                        that the application developer wants to maintain all CRUD logic
+                        internally to the application (at least on certain APIs). If that's
+                        the case AIRport can accomidate that but scrubbing all object State
+                        when an API is called.
+                        <code>
+                            <pre>
+@Injectable()
+<b>export class</b> AnApiClass {
+
+    @Api({ objectState: true})
+    <b>async</b> anApi(): any {
+        ...
+    }        
+}
+                            </pre>
+                        </code>
+
+                        Again the default will be to leave the API open to external 
+                        modifications, at this point it is hard to determine what will
+                        likely be the most common scenario - direct modifications from 
+                        modern think UIs or more traditional lockdown approach of 
+                        server side development.
+
+                        <h2>@SaveEntryPoint()</h2>
+                        To build on top of <a href="./Solidifying_Interop.html">initial
+                        application interability thoughts</a> I'm proposing a new
+                        decorator to mark points where save operations can cascade.  As
+                        a recap - save operations that cross application schema boundaries
+                        will call into the logic of the Applications that contain the
+                        schemas with nested objects.  That way the application always
+                        has control over how the objects in it's schema get saved
+                        and can run the necessary validation logic to make sure
+                        that records are maintained in a proper order.
+                        <br>
+                        <br>
+                        A accomplish this a new @SaveEntryPoint() decorator will 
+                        be introduced. A method decorated with this decorator will always
+                        take an array of the corresponding entity objects and nothing else
+                        and there may only be one @EntitySave() method per entity type.
+                        This is necessary for the framework to make a determination what
+                        method to invoke for a given entity- if there is more than one than
+                        it becomes unclear what method to invoke.  Note that for any given
+                        save operation, this acts as an entry point.  The entire object
+                        sub-graph that belongs to this Application's schema will be
+                        processed without calling any other @SaveEntryPoint()s for nested
+                        objects.
+
+                    </div> <!-- end entry content -->
+
+                </article> <!-- end column large-full entry-->
+
+
+
+
+                <div class="comments-wrap">
+                </div> <!-- end comment-respond -->
+
+            </main>
+
+        </div> <!-- end s-content -->
+
+
+        <!-- footer
+    ================================================== -->
+        <footer class="s-footer footer">
+        </footer>
+
+    </div> <!-- end s-wrap -->
+
+
+    <!-- Java Script
+================================================== -->
+    <script src="../js/post-component-loader.js"></script>
+    <script src="../js/jquery-3.2.1.min.js"></script>
+    <script src="../js/plugins.js"></script>
+    <script src="../js/main.js"></script>
+
+</body>

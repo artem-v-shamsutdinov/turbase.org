@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html class="no-js" lang="en">
+
+<head>
+
+    <!--- basic page needs
+    ================================================== -->
+    <meta charset="utf-8">
+    <title>AIRport Blog</title>
+    <meta name="description" content="Application Interoperability">
+    <meta name="author" content="Artem V Shamsutdinov">
+
+    <!-- mobile specific metas
+    ================================================== -->
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- CSS
+    ================================================== -->
+    <link rel="stylesheet" href="../css/base.css">
+    <link rel="stylesheet" href="../css/vendor.css">
+    <link rel="stylesheet" href="../css/main.css">
+
+    <!-- script
+    ================================================== -->
+    <script src="../js/modernizr.js"></script>
+
+    <!-- favicons
+    ================================================== -->
+    <link rel="apple-touch-icon" sizes="180x180" href="../apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="../favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
+    <link rel="manifest" href="../site.webmanifest">
+
+</head>
+
+<body class="ss-bg-white">
+
+    <!-- preloader
+================================================== -->
+    <div id="preloader">
+        <div id="loader" class="dots-fade">
+            <div></div>
+            <div></div>
+            <div></div>
+        </div>
+    </div>
+
+    <div id="top" class="s-wrap site-wrapper">
+
+        <!-- site header
+    ================================================== -->
+        <header class="s-header header">
+        </header> <!-- end s-header -->
+
+
+        <!-- site content
+    ================================================== -->
+        <div class="s-content content">
+            <main class="row content__page">
+
+                <article class="column large-full entry format-standard">
+
+                    <div class="media-wrap entry__media">
+                        <div class="entry__post-thumb">
+                            <img alt="Marvel Fusion's diode-pumped laser systems with ultrashort pulses"
+                                sizes="(max-width: 1000px) 100vw, 1000px" src="images/Marvel-Fusion.png">
+                            <p style="text-align: center; width: 100%">
+                                Marvel Fusion's diode-pumped laser system with ultrashort pulses
+                                <a href="https://marvelfusion.com/technology/">
+                                    dramatically reduces costs
+                                </a> and can drastically reduce the need for magnetic confinement.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="content__page-header entry__header">
+                        <h1 class="display-1 entry__title">
+                            Short Queries
+                        </h1>
+                        <ul class="entry__header-meta">
+                            <li class="author">By Artem V. Shamsutdinov</li>
+                            <li class="date">June 17th, 2022</li>
+                        </ul>
+                    </div> <!-- end entry__header -->
+
+                    <div class="entry__content">
+
+                        <p>
+
+                            One thing I'm starting to think about is AIRport adoption. It will certainly be
+                            useful for building production applications but it's query syntax lacks a bit 
+                            when it comes to quickly cranking out prototypes. Or rather, it really doesn't
+                            take that much time to define an entity query with a join but the perception
+                            I get when I type them out is that it's tedious.
+                        </p>
+                        <h2>The "feels slow" part.</h2>
+                        <p>
+                            There are two parts to the existing queries that will probably bother developers who just
+                            want to throw together a quick join. Here is an example of a standard AIRport (entity)
+                            query:
+                        </p>
+                        <pre><code><b>import</b> { QEntityA, QEntityB, QEntityC, QEntityD, Q} <b>from</b> '../generated/generated';
+
+<b>class</b> ADao {
+
+	<b>sync</b> findSomething(
+		field1Value: string,
+		bUuId: string,
+		dUuId: string,
+	) {
+		<b>let</b> a: QEntityA,
+		    b: QEntityB,
+		    c: QEntityC,
+		    d: QEntityD
+		<b>return await this</b>._find({
+			select: {
+				'*': Y,
+				entityB: {
+					entityC: {}
+				}
+			},
+			from: [
+				a = Q.EntityA,
+				b = a.entityB.leftJoin(),
+				c = b.entityC.leftJoin(),
+				d = a.entityD.leftJoin()
+			],
+			where: and(
+				a.field1.equals(field1Value),
+				b.equals(bUuId),
+				d.equals(dUuId)
+			)
+		})
+	}
+
+}</code></pre>
+                        <p>
+                            First it's the "let" at the top of the method. These declarations
+                            are a language requirement to get the query working. They aren't
+                            really part of the underlying SQL and that's annoying in itself.
+                            When you are trying to quickly write a select statement
+                            having to go back to the top and add an alias for
+                            every entity in the SELECT and the WHERE clauses is rather
+                            annoying. On top of that you also have to be aware of the Q
+                            prefix for all Query Entities and have to import them.
+                        </p>
+                        <p>
+                            The second annoying part is the FROM clause. For vast majority
+                            of the cases you'll just be doing LEFT JOINs. And wouldn't it be
+                            great if the FROM clause was just implied and aliases worked
+                            by convention?
+                        </p>
+                        <h2>The new "Quick and Dirty"</h2>
+                        <p>
+                            To improve the perceived convenience of the Query API I'm
+                            proposing a secondary, much more limited API that is quick
+                            to type out:
+                        </p>
+                        <pre><code><b>class</b> ADao {
+
+    <b>async</b> findSomething(
+		field1Value,
+		bUuId,
+		dUuId
+	) {
+		<b>const</b> a = <b>this</b>._select({
+			'*': Y,
+			entityB: {
+				entityC: {}
+			}
+		})
+		<b>return</b> await <b>this</b>._where(
+			and(
+				a.field1.equals(field1Value),
+				a.entityB.equals(bUuId),
+				a.entityD.equals(dUuId)
+			)
+		)
+	}
+
+}</code></pre>
+                        <p>
+                            It's much shorter, has no forced imports or variable declarations
+                            (except the SELECT clause variable).
+                            All of the entities in the SELECT and the WHERE clause are
+                            automatically joined with LEFT JOINs.  No fluff whatsoever.
+                        </p>
+                        <h2>When</h2>
+                        <p>
+                            Since this syntax isn't required for a fully functioning framework
+                            (and since it will take work to implement the necessary query wrappers
+                            and the ability to deduce what joins to build) I'm not planning on
+                            implementing it until Beta is out. It's really all about when will
+                            it be most needed by the community - when AIRport will be used
+                            to quickly crank out functional prototypes.
+                        </p>
+                    </div> <!-- end entry content -->
+
+                </article> <!-- end column large-full entry-->
+
+                <div class="comments-wrap">
+                </div> <!-- end comment-respond -->
+
+            </main>
+
+        </div> <!-- end s-content -->
+
+
+        <!-- footer
+================================================== -->
+        <footer class="s-footer footer">
+        </footer>
+
+    </div> <!-- end s-wrap -->
+
+
+    <!-- Java Script
+================================================== -->
+    <script src="../js/post-component-loader.js"></script>
+    <script src="../js/jquery-3.2.1.min.js"></script>
+    <script src="../js/plugins.js"></script>
+    <script src="../js/main.js"></script>
+
+</body>

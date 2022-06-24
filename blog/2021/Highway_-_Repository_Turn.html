@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html class="no-js" lang="en">
+
+<head>
+
+    <!--- basic page needs
+    ================================================== -->
+    <meta charset="utf-8">
+    <title>AIRport Blog</title>
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <!-- mobile specific metas
+    ================================================== -->
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- CSS
+    ================================================== -->
+    <link rel="stylesheet" href="../css/base.css">
+    <link rel="stylesheet" href="../css/vendor.css">
+    <link rel="stylesheet" href="../css/main.css">
+
+    <!-- script
+    ================================================== -->
+    <script src="../js/modernizr.js"></script>
+
+    <!-- favicons
+    ================================================== -->
+    <link rel="apple-touch-icon" sizes="180x180" href="../apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="../favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
+    <link rel="manifest" href="../site.webmanifest">
+
+</head>
+
+<body class="ss-bg-white">
+
+    <!-- preloader
+================================================== -->
+    <div id="preloader">
+        <div id="loader" class="dots-fade">
+            <div></div>
+            <div></div>
+            <div></div>
+        </div>
+    </div>
+
+    <div id="top" class="s-wrap site-wrapper">
+
+        <!-- site header
+    ================================================== -->
+        <header class="s-header header">
+        </header> <!-- end s-header -->
+
+
+        <!-- site content
+    ================================================== -->
+        <div class="s-content content">
+            <main class="row content__page">
+
+                <article class="column large-full entry format-standard">
+
+                    <div class="media-wrap entry__media">
+                        <div class="entry__post-thumb">
+                            <img alt="A view of a road, with Singapore in the background"
+                                sizes="(max-width: 1000px) 100vw, 1000px" src="images/Singapore-Skyline-Empty-Road.jpg">
+                        </div>
+                    </div>
+
+                    <div class="content__page-header entry__header">
+                        <h1 class="display-1 entry__title">
+                            Highway - Repository Turn
+                        </h1>
+                        <ul class="entry__header-meta">
+                            <li class="author">By Artem V. Shamsutdinov</li>
+                            <li class="date">Jan 15th, 2021</li>
+                        </ul>
+                    </div> <!-- end entry__header -->
+
+                    <div class="entry__content">
+                        <p>Recently I've have arrived at a breakthough in thinking about how
+                            <a href="./Highway_The_Beginning.html">Highway</a> can be implemented
+                            in a strait forward and simple way, provided that some assumptions
+                            are kept about underlying data usage.
+                        </p>
+                        <h2>Repository usage patterns</h2>
+                        <p>
+                            The break-though came as a result of thinking about Repositories
+                            and how repositories are intended to be used and shared.
+                        </p>
+                        <p>
+                            Repositories are meant to be autonomous units of knowledge that
+                            are used across multiple applications and tie in all of the
+                            functionality realted to that knowledge unit.  What I was missing
+                            before is that for the bulk of use cases any given UI will
+                            present data for one repository at a time.  In the cases where 
+                            UIs need to present data across repositories it is possible
+                            to create new, aggregate repositories for that usecase and still
+                            present the bulk of the data for one central repository.
+                        </p>
+                        <h2>Proposed implementation</h2>
+                        <p>
+                            With these usage patterns in mind it is possible constrain
+                            all UI operations to a single repository (or a set of related
+                            repositories).  Then presenting a screen (or a set of
+                            related screens) can become a matter of loading the repository
+                            transaction logs (or in some cases, like a chat thread, just the
+                            recent entries in the transaction log).
+                        </p>
+                        <p>
+                            The next piece of the puzzle is the fact that AIRport in its
+                            entirety (from framework to client applications) is runnable in 
+                            the browser.  Upon SPA intialization for of the application
+                            it along with sql.js can be loaded into memory and subsequently
+                            retrieve repository transaction logs from the server, turn them 
+                            into traditional relational data and serve complex queries needed 
+                            by the UI.  The overall system diagram in that case can look like 
+                            this:
+                        </p>
+                        <img src="./images/Highway_diagram.png">
+                        <p>
+                            All of Highway write operations will be sent to an AIRport
+                            installation on the server-side, where all of operations can be
+                            propertly validated.  Server-side AIRport will contain an
+                            additional module that will write serlialized transaction logs
+                            to wide column storage, where they can be quickly retrieved
+                            by the repository Id (and optionally a time-frame constraint).
+                            In addition to that server-side AIRport can maintain a full
+                            text search database, which will contain full text mappings
+                            to a combination of Repository ID + timestamp of Transaction
+                            Log entry that contains the match.
+                        </p>
+                        <p>
+                            Further details on this setup are yet to be flushed out but I'm 
+                            very excited about this approach.  In my mind it represents
+                            best of both worlds of centrialized data processing and
+                            utilization of modern client side hardware.   It should serve
+                            the bulk of use-cases I can think off while providing a fallback
+                            schenario where querying the server-side relational database
+                            is possible.
+                        </p>
+                        <h2>Observables as a bonus</h2>
+                        <p>
+                            A nice bonus to this approach is that it comes with a very
+                            strait forward implemntation of observable behavior.  The client
+                            can simply subscribe to all new transaction log entries for a
+                            given repository and then process the data to see if any
+                            of the fields in the obserable query are affected by latest
+                            entries.  If they are an updated result will be sent to the UI. 
+                            Again everything in this approach keys off the fact that queries
+                            will be limited by a Repository ID. 
+                        </p>
+                    </div> <!-- end entry content -->
+
+                </article> <!-- end column large-full entry-->
+
+
+                <div class="comments-wrap">
+                </div> <!-- end comment-respond -->
+
+            </main>
+
+        </div> <!-- end s-content -->
+
+
+        <!-- footer
+    ================================================== -->
+        <footer class="s-footer footer">
+        </footer>
+
+    </div> <!-- end s-wrap -->
+
+
+    <!-- Java Script
+================================================== -->
+    <script src="../js/post-component-loader.js"></script>
+    <script src="../js/jquery-3.2.1.min.js"></script>
+    <script src="../js/plugins.js"></script>
+    <script src="../js/main.js"></script>
+
+</body>

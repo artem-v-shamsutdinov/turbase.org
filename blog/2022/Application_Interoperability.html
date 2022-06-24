@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html class="no-js" lang="en">
+
+<head>
+
+    <!--- basic page needs
+    ================================================== -->
+    <meta charset="utf-8">
+    <title>AIRport Blog</title>
+    <meta name="description" content="Application Interoperability">
+    <meta name="author" content="Artem V Shamsutdinov">
+
+    <!-- mobile specific metas
+    ================================================== -->
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- CSS
+    ================================================== -->
+    <link rel="stylesheet" href="../css/base.css">
+    <link rel="stylesheet" href="../css/vendor.css">
+    <link rel="stylesheet" href="../css/main.css">
+
+    <!-- script
+    ================================================== -->
+    <script src="../js/modernizr.js"></script>
+
+    <!-- favicons
+    ================================================== -->
+    <link rel="apple-touch-icon" sizes="180x180" href="../apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="../favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
+    <link rel="manifest" href="../site.webmanifest">
+
+</head>
+
+<body class="ss-bg-white">
+
+    <!-- preloader
+================================================== -->
+    <div id="preloader">
+        <div id="loader" class="dots-fade">
+            <div></div>
+            <div></div>
+            <div></div>
+        </div>
+    </div>
+
+    <div id="top" class="s-wrap site-wrapper">
+
+        <!-- site header
+    ================================================== -->
+        <header class="s-header header">
+        </header> <!-- end s-header -->
+
+
+        <!-- site content
+    ================================================== -->
+        <div class="s-content content">
+            <main class="row content__page">
+
+                <article class="column large-full entry format-standard">
+
+                    <div class="media-wrap entry__media">
+                        <div class="entry__post-thumb">
+                            <img alt="Petawatt Laser"
+                                sizes="(max-width: 1000px) 100vw, 1000px" src="images/Petawatt_Laser.jpg">
+                            <p style="text-align: center; width: 100%">
+                                <a href="https://hb11.energy/">HB11 Energy</a> has
+                                <a
+                                    href="https://hb11.energy/2022/03/29/world-first-hb11-energy-demonstrates-nuclear-fusion-using-a-laser/">
+                                    demonstrated
+                                </a> a 'material' number of fusion reactions, producing ten times more fusion reactions
+                                than expected.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="content__page-header entry__header">
+                        <h1 class="display-1 entry__title">
+                            Application Interoperability
+                        </h1>
+                        <ul class="entry__header-meta">
+                            <li class="author">By Artem V. Shamsutdinov</li>
+                            <li class="date">April 4th, 2022</li>
+                        </ul>
+                    </div> <!-- end entry__header -->
+
+                    <div class="entry__content">
+                        <p>
+                            A key feature of AIRport framework is the ability of applications to interoperate.
+                            This is possible because of two reasons:
+                        </p>
+                        <ol>
+                            <li>
+                                For reads, applications can create @ManyToOne relationships to tables
+                                of existing schemas. And any application can query for all data in device's
+                                database (across all application schemas, if permitted).
+                            </li>
+                            <li>
+                                AIRport persists all entities across application schemas and invokes all
+                                necessary validation and business logic.
+                            </li>
+                        </ol>
+                        <h2>Read Queries</h2>
+                        <p>
+                            Management of read queries is pretty strait forward. The raw AIRport framework is
+                            not concerned with it since no modifications are made. For Turbase, it is possible
+                            figure out what part of the query belongs to which application and apply necessary
+                            permissions as well as split advertisement revenue between them.
+                        </p>
+                        <h2>Modifications</h2>
+                        <p>
+                            My initial thoughts on how to support saving of nested entities was to have support
+                            for nested save calls. However that does not support execution of any validation
+                            and business logic that applications may want to do before the entities are saved.
+                        </p>
+                        <p>
+                            Instead, the final version of Application Interoperability allows applications to
+                            call APIs of other applications to execute modificaition logic for the apps that
+                            manage nested entities. Ability to invoke APIs of other applications would be
+                            implemented in any case. However, relying on it for persistence of nested objects
+                            makes the overall approach more intuitive. To accommodate for that objects that
+                            are passed into a save call of a particular application will be ignored if they do not
+                            belong to that application. This of course means that the persistence of nested
+                            objects will have to be done in the right order to work for newly created entities.
+                        </p>
+                        <h2>Project Types</h2>
+                        <p>
+                            The final version of Application Interoperability has 3 types of projects for each
+                            application:
+                        </p>
+                        <ol>
+                            <li>Default</li>
+                            <li>Runtime</li>
+                            <li>Client</li>
+                        </ol>
+                        <h3>Default</h3>
+                        <p>
+                            The default project is what the developer creates explicitly. It contains
+                            all of the core code for the application: DDL, DAOs, API. It also contains
+                            generated sources for the query API and other auxiliary logic. It's main
+                            file is "src/generated/api.ts". It does not include any of the
+                            non-generated code and instead includes generated wrappers around each
+                            of the API classes for the project.
+                        </p>
+                        <p>
+                            The default project does include the generated query objects. This is
+                            because the default project is what other applications use as a
+                            dependency. Other apps can either call the pre-defined API methods (in
+                            which case the calls are passed back to the framework and are executed
+                            in the runtime version of the app), or run queries using generated query
+                            objects.
+                        </p>
+                        <h3>Runtime</h3>
+                        <p>
+                            The runtime project is nested within the default project inside a
+                            'runtime' directory. It will be completely generated and will have
+                            all of the dependencies needed to build a runtime application. It
+                            will also contain the build script and generate a bundle that will
+                            deploy the full version of the application. This is the project
+                            that actually includes the sources from the DDLs, DAOs and APIs of
+                            the default project because its the 'runtime' project that will
+                            actually be executing the application code.
+                        </p>
+                        <h3>Client</h3>
+                        <p>
+                            The client project is also nested within the default project (
+                            inside the 'client' directory). It will also be completely generated
+                            and will include a non-injected wrappers around all of the app's APIs.
+                            These are the wrappers that will be called by external clients. They
+                            are not injected by AIRport dependency injection framework since the
+                            external client does not run inside AIRport - the wrappers have to
+                            be 'new'ed to be used. The wrappers will forward the calls to the
+                            AIRport framework (running in a separate tab or as a native
+                            application), which will forward them to the application (which is
+                            either nested in an IFrame, inside the framework tab, or is running in
+                            a V8 isolate of the native application for the framework). The client
+                            project also includes all of the generated interfaces for the DDL
+                            objects.
+                        </p>
+                        <p>
+                            I'm still thinking of whether to include the DDL objects themselves.
+                            Theoretically they shouldn't have any business logic and the only
+                            benefit of including them is ability to use entity names (instead of
+                            the names of generated interfaces, which are prefixed with the letter
+                            'I').
+                        </p>
+                        <h2>Transactions</h2>
+                        <p>
+                            Another issue that so far has not been decided on is transactionality. My prior
+                            thoughts were to either add support for @Transactional() methods or to allow for
+                            explicit calls to the "transactional" function. However for AIRport all
+                            transactions always go into the same database and there is no need for JPA style
+                            transactions. Really all calls made via a particular API should always belong
+                            to the same transaction. And if that API call is nested in another API call,
+                            all of the operations in this API should be included in the transaction of the
+                            outer API call.
+                        </p>
+                        <p>
+                            Hence, the final solution is to make every @Api() method transactional. If an
+                            @Api() method is called from another @Api() method it is automatically included in
+                            the transaction of the parent method. In the future support for @Transactional()
+                            methods may be included if the need for that arises.
+                        </p>
+                        <p>
+                            To allow for multiple read calls to go through while a write @Api() call is in
+                            progress, @Api({ readOnly: true }) will be supported (eventually). A read-only
+                            @Api() call will be allowed to execute while a write-enabled @Api() call is in
+                            progress. If a read-only @Api() call attempts to execute a write statement it
+                            will throw an exception. If a write @Api() call is nested inside a read-only
+                            @Api() call, it will block and wait for any executing write @Api() calls
+                            before completing.
+                        </p>
+                        <h3>How it's done</h3>
+                        <p>
+                            The way this will be done is via keeping track of nested @Api() calls with a
+                            call stack. When the first @Api() call is made a transaction is started. That
+                            transaction is maintained until that @Api() call returns a value, at which point
+                            the transaction is committed. The nested @Api() call is stored in a stack of
+                            parent-child TRANSACTION_IDs, when a child @Api() call is started a child
+                            TRANSACTION_ID is generated and is passed into the the called application. When
+                            the called @Api() returns, it returns it's child TRANSACTION_ID and that
+                            call is popped off the stack.
+                        </p>
+                        <p>
+                            This implementation also helps track @Api() calls from other UIs and Apps that
+                            are not nested in the current transaction. Such calls are put into a separate
+                            FIFO queue and are executed subsequently. Read-only calls are executed
+                            immediately.
+                        </p>
+                        <h3>Rolling Back</h3>
+                        <p>
+                            AIRport is based on SQLite, which supports SAVEPOINT and RELEASE TO statements.
+                            This enables fine grained handling of nested @Api() transactions. Whenever a
+                            nested non-read-only @Api() is called (and also for the outer most call)
+                            following command is issued:
+                        <pre><code>SAVEPOINT $TRANSACTION_ID</code></pre>
+                        When an @Api() successfully returns following command is issued:
+                        <pre><code>RELEASE SAVEPOINT $TRANSACTION_ID</code></pre>
+                        If an @Api() throws an exception following command is issued:
+                        <pre><code>ROLLBACK TO SAVEPOINT $TRANSACTION_ID</code></pre>
+
+                        This allows for automatic management transactions in a nested @Api() call,
+                        without having to rollback the entire transaction.
+
+                        To allow for management of savepoints within an @Api() call, the following()
+                        commands will be available:
+                        </p>
+                        <pre><code>const savePointId = savepoint()
+release(savePointId)
+rollbackTo(savePointId)</code></pre>
+                    </div> <!-- end entry content -->
+
+                </article> <!-- end column large-full entry-->
+
+                <div class="comments-wrap">
+                </div> <!-- end comment-respond -->
+
+            </main>
+
+        </div> <!-- end s-content -->
+
+
+        <!-- footer
+    ================================================== -->
+        <footer class="s-footer footer">
+        </footer>
+
+    </div> <!-- end s-wrap -->
+
+
+    <!-- Java Script
+================================================== -->
+    <script src="../js/post-component-loader.js"></script>
+    <script src="../js/jquery-3.2.1.min.js"></script>
+    <script src="../js/plugins.js"></script>
+    <script src="../js/main.js"></script>
+
+</body>
+

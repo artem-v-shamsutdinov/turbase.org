@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html class="no-js" lang="en">
+
+<head>
+
+    <!--- basic page needs
+    ================================================== -->
+    <meta charset="utf-8">
+    <title>AIRport Blog</title>
+    <meta name="description" content="The solution for natural Dao logic">
+    <meta name="author" content="Artem V Shamsutdinov">
+
+    <!-- mobile specific metas
+    ================================================== -->
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- CSS
+    ================================================== -->
+    <link rel="stylesheet" href="../css/base.css">
+    <link rel="stylesheet" href="../css/vendor.css">
+    <link rel="stylesheet" href="../css/main.css">
+
+    <!-- script
+    ================================================== -->
+    <script src="../js/modernizr.js"></script>
+
+    <!-- favicons
+    ================================================== -->
+    <link rel="apple-touch-icon" sizes="180x180" href="../apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="../favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
+    <link rel="manifest" href="../site.webmanifest">
+
+</head>
+
+<body class="ss-bg-white">
+
+    <!-- preloader
+================================================== -->
+    <div id="preloader">
+        <div id="loader" class="dots-fade">
+            <div></div>
+            <div></div>
+            <div></div>
+        </div>
+    </div>
+
+    <div id="top" class="s-wrap site-wrapper">
+
+        <!-- site header
+    ================================================== -->
+        <header class="s-header header">
+        </header> <!-- end s-header -->
+
+
+        <!-- site content
+    ================================================== -->
+        <div class="s-content content">
+            <main class="row content__page">
+
+                <article class="column large-full entry format-standard">
+
+                    <div class="media-wrap entry__media">
+                        <div class="entry__post-thumb">
+                            <img alt="MIT in collaboration with Commonwealth Fusion Systems created a 20 Tesla magnet"
+                                sizes="(max-width: 1000px) 100vw, 1000px" src="images/MIT-superconducting-magnet.jpg">
+                            <p style="text-align: center; width: 100%">MIT in collaboration
+                                with <a href="https://cfs.energy/">Commonwealth Fusion Systems</a> created a
+                                <a
+                                    href="https://www.universetoday.com/152521/researchers-create-the-most-powerful-magnet-ever-made-on-earth-20-teslas/">20
+                                    Tesla magnet</a>.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="content__page-header entry__header">
+                        <h1 class="display-1 entry__title">
+                            Migrating the data
+                        </h1>
+                        <ul class="entry__header-meta">
+                            <li class="author">By Artem V. Shamsutdinov</li>
+                            <li class="date">August 28th, 2021</li>
+                        </ul>
+                    </div> <!-- end entry__header -->
+
+                    <div class="entry__content">
+                        Schema migrations are hard in general. In AIRport/Turbase schema migrations
+                        are even harder for a number of reasons (in order of complexity):
+                        <ul>
+                            <li>Migration scripts must work across schema dependencies</li>
+                            <li>Schemas need to be backward compatible with applications that use older versions</li>
+                            <li>Both live data and serialized transaction logs must be migrated</li>
+                            <li>Repositories must work across devices with different schema versions</li>
+                        </ul>
+                        The first entry in this list should have an algorithmic solution since circular dependencies
+                        between schemas are disallowed.
+                        <br>
+                        <br>
+                        As discussed previously, backward compatibility can be accomplished with maintaining views
+                        for read operations, while disallowing any modifications until the app is upgraded. The
+                        solution presented today opens up a way to maintain backward write compatibility as well.
+                        <br>
+                        <br>
+                        The solution to dual migration of live and serialized data has so far been to maintain
+                        two different versions of migration scripts. This is of course very error prone and is
+                        an unnecessary source of data migration bugs. Today's post aims to provide a single upgrade
+                        path approach.
+                        <br>
+                        <br>
+                        Making modifications to the same data across devices with different schema versions is
+                        a tall order that I'm only now beginning to think about. But a key realization is
+                        that it is tighly intertwined with live/serilized problem solution since both must support
+                        concurrent modifications across schema versions. Most likely actually solving this (and
+                        the above) problem will require input and work from many people (and lots and lots of testing).
+
+                        <h2>Unifying live and serialized upgrades</h2>
+
+                        A key insight in solving this issue appears to be: maintain insertable views for
+                        each version of the schema. This way changes to an older version of the schema
+                        will automatically propagate to whatever the latest version is installed on the
+                        device. And when that version is itself upgraded it's older table versions
+                        themselves become insertable views.
+                        <br>
+                        <br>
+                        This is a very elegant solution as it solves all of the currently known hard
+                        problems of schema migration. Of course the way of actually accomplishing this
+                        is yet to present itself, but a few facts will likely be present in the
+                        implementation:
+                        
+                        <h2>Virtual Views</h2>
+                        The insertable views won't be traditional database views.  Instead every operation
+                        coming in will contain the schema version it's operating against.  Since the API for
+                        that version will already be based on that version there is no need to come up with
+                        extra views.  Instead AIRport will internally adjust the operations, based on 
+                        "migration view hooks" provided for the schema.
+                        <br>
+                        <br>
+                        These hooks will have to be created on per column level and executed on per cell
+                        level. This is because of inserts and updates, which may not be duable without the
+                        ability to modify a cell (like inspect it and split into multiple columns). Luckly
+                        this shouldn't be too hard to accomplish since AIRport already keeps track of all
+                        changes on per row and per cell basis in order to maintain Repository history.
+
+                        <h2>View Hooks</h2>
+                        It's hard to say exactly how the view hooks will look but a desireable way is to keep
+                        them declarative where possible and programmatic where necessary.  For example, if
+                        a column moved from one table to another then that can be specified declaratively.
+                        But if a column got split into multiple ones, based on some logic then that will
+                        have to be done programmatically.
+
+                        <h2>DDL restrictions</h2>
+                        There will likely have to be a number of DDL restrictions to make it all work. For
+                        example, most definitely all new NON NULL columns will have to have a default value
+                        in order to enable insertion from older views.  Actually there probably won't be
+                        any NON NULL columns that are not IDs, but that's a discussion for a different
+                        post (related to how repositories will work).
+                        <br>
+                        <br>
+                        Another restriction likely to be required is disallowing column removal - columns
+                        may only be expanded, renamed or moved to another table. Columns can be split
+                        but cannot be deleted since that is loss of data that may be of interest for
+                        inspection for repository history.  Backward compatibily for older schema versions
+                        probably won't have to be required (if a record got entered with into a new
+                        schema version the old column value will just be NULL).
+
+                        <h2>Multi-pass publishing system</h2>
+                        In order to generate view harnesses (which will hopefully be the only required upgrade
+                        logic) it makes sense to add a multi-pass publishing system consisting of
+                        <ul>
+                            <li>
+                                Version
+                            </li>
+                            <li>
+                                Publish snapshot
+                            </li>
+                            <li>
+                                Publish
+                            </li>
+                        </ul>
+                        The harness will make it easy to plugin upgrade scripts.  Per cell handlers will
+                        be generated based on schema diffs (previous version vs new version).
+
+                        <h3>Version</h3>
+                        Whenever a new schema version is created the old version gets copied to a separate versioned
+                        location. Older versions of the schema are kept around along with the old migration scripts
+                        (and probably all of the logic, looking forward towards concurrent cross version modifications).
+                        This also allows for automatic detection of major/minor/patch with diff of schema versions
+                        during the schema verisiong process itself, with the tree types being (as usual):
+                        <br>
+                        <br>
+                        <ul>
+                            <li>Patch version - no schema changes, only code</li>
+                            <li>Minor version - expansion of columns string (allowing for more characters) and number
+                                (higher precision)
+                                columns. Addition of nullable columns (NOT NULL columns won't be supported due to 
+                                how repositories will work, but more on that in the following post).
+                                Addition of new tables.</li>
+                            <li>
+                                Major version - all other schema changes
+                            </li>
+                        </ul>
+
+                        <h3>Snapshot publishing</h3>
+                        Publishing is snapshot is beneficial to developers of applications that depend on this schema
+                        they can start migrating their Apps to the latest schema version. Snapshots can be published
+                        without data migration scripts being in place.  Snapshots will also fix schema migration
+                        scripts - once you publish a snapshot next version run will go from this snapshot (that is
+                        it will diff the the last snapshot or publish against whatever new changes where provided,
+                        though this can be made configurable)
+
+                        <h3>Publish</h3>
+                        Publish is the "big kahuna". Unlike snapshots it goes to end user devices and upgrades
+                        existing production schemas. Schema developers should excersize courtesy towards App
+                        developers that use their schema buy being on the lookout for snaphots from them. The
+                        right time to publish a schema is when all dependent Apps have published mitigating
+                        snapshots themselves.
+                        <br>
+                        <br>
+                        One nice thing about this approach is that it standardizes when upgrade scripts can be
+                        added. This means that the framework can generate the necessary harnesses that
+                        will be called during schema migration, thus freeing the developer from the task
+                        of wiring in the upgrade jobs into the upgrade system.
+
+                        <h3>Details to come</h3>
+                        This post only outlines the general approach for schema migration.  Details will come
+                        at a later point once actual implementation will take place.
+
+                    </div> <!-- end entry content -->
+
+                </article> <!-- end column large-full entry-->
+
+
+
+                 
+                <div class="comments-wrap">
+                </div> <!-- end comment-respond -->
+
+            </main>
+
+        </div> <!-- end s-content -->
+
+
+        <!-- footer
+    ================================================== -->
+        <footer class="s-footer footer">
+        </footer>
+
+    </div> <!-- end s-wrap -->
+
+
+    <!-- Java Script
+================================================== -->
+    <script src="../js/post-component-loader.js"></script>
+    <script src="../js/jquery-3.2.1.min.js"></script>
+    <script src="../js/plugins.js"></script>
+    <script src="../js/main.js"></script>
+
+</body>

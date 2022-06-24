@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html class="no-js" lang="en">
+<head>
+
+    <!--- basic page needs
+    ================================================== -->
+    <meta charset="utf-8">
+    <title>AIRport Blog</title>
+    <meta name="description" content="The solution for natural Dao logic">
+    <meta name="author" content="Artem V Shamsutdinov">
+
+    <!-- mobile specific metas
+    ================================================== -->
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- CSS
+    ================================================== -->
+    <link rel="stylesheet" href="../css/base.css">
+    <link rel="stylesheet" href="../css/vendor.css">
+    <link rel="stylesheet" href="../css/main.css">
+
+    <!-- script
+    ================================================== -->
+    <script src="../js/modernizr.js"></script>
+
+    <!-- favicons
+    ================================================== -->
+    <link rel="apple-touch-icon" sizes="180x180" href="../apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="../favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
+    <link rel="manifest" href="../site.webmanifest">
+
+</head>
+
+<body class="ss-bg-white">
+
+<!-- preloader
+================================================== -->
+<div id="preloader">
+    <div id="loader" class="dots-fade">
+        <div></div>
+        <div></div>
+        <div></div>
+    </div>
+</div>
+
+<div id="top" class="s-wrap site-wrapper">
+
+    <!-- site header
+    ================================================== -->
+    <header class="s-header header">
+    </header> <!-- end s-header -->
+
+
+    <!-- site content
+    ================================================== -->
+    <div class="s-content content">
+        <main class="row content__page">
+
+            <article class="column large-full entry format-standard">
+
+                <div class="media-wrap entry__media">
+                    <div class="entry__post-thumb">
+                        <img
+                                alt="General Fusion is building a Fusion Demonstration Plant in UK"
+                                sizes="(max-width: 1000px) 100vw, 1000px"
+                                src="images/general-fusion-reactor.jpg"
+                        >
+                        <p style="text-align: center; width: 100%"><a href="https://generalfusion.com/">General Fusion</a> is building 
+                            a <a href="https://generalfusion.com/2021/06/general-fusion-to-build-its-fusion-demonstration-plant-in-the-uk-at-the-ukaea-culham-campus/">
+                                Fusion Demonstration Plant</a> in UK</p>
+                    </div>
+                </div>
+
+                <div class="content__page-header entry__header">
+                    <h1 class="display-1 entry__title">
+                        Schemas in Action
+                    </h1>
+                    <ul class="entry__header-meta">
+                        <li class="author">By Artem V. Shamsutdinov</li>
+                        <li class="date">August 24th, 2021</li>
+                    </ul>
+                </div> <!-- end entry__header -->
+
+                <div class="entry__content">
+                    The next step after code execution isolates and schema upgrade strategy
+                    is defining exactly how schemas will be installed and how they will
+                    run.  Here is my first (detailed) take on it:
+                    <h2>Artifacts</h2>
+                    Schemas at runtime will consist of 4 separate piecies:
+                    <ul>
+                        <li>
+                        JSON definition file
+                        </li>
+                        <li>
+                        Isolate library
+                        </li>
+                        <li>
+                        Client side library
+                        </li>
+                        <li>
+                        Checksum file
+                        </li>
+                    </ul>
+                    JSON definitions will contain the schema DDL.  It will also
+                    contain a list of all other schemas (and their versions) that this
+                    schema depends on.
+                    <br>
+                    <br>
+                    The Isolate library is all of the server side logic that is needed by
+                    the schema, stripped of all of it's dependencies.  The core dependencies
+                    will be automatically provided by the AIRport application.  The schema
+                    dependencies will be downloaded by AIRport application and loaded into 
+                    the same Isolate.  The isloate library will be exposed via a special 
+                    "internal_index.ts" file that will tie in all of the files required.
+                    <br>
+                    <br>
+                    Client side library will be a minimal set of runtime artifacts needed
+                    to run a client.  Presently the only thing that is needed is a small 
+                    shim (of 3 AIRport libraries, packaged separately to reduce redundancy)
+                    and the definition of the tokens used for dependency injection.  The 
+                    rest of the client side library (fronted by the usual "index.ts") will 
+                    consist of interfaces and won't have any run-time footprint.
+                    <h2>Insuring authenticity</h2>
+                    Lastly, checksum file will contain a checksum for (in the form of a
+                    signature) that will ensure that the combination of the "JSON definition
+                    file" and "Isolate library" have not been tampered with and are indeed
+                    from the schema publisher.
+                    <h2>Installation process</h2>
+                    Installation of any given schema will come as a result of a client App 
+                    making an API call to it.
+                    <br>
+                    <br>
+                    The client side library will first attempt to invoke the local AIRport 
+                    App/server.  If it's not found (not listening on the specified localhost
+                    port) it will prompt the user to either install AIRport App or run
+                    the client App in "demo mode" (demo mode will just open another tab
+                    with the AIRport server running in window.postmesage mode).
+                    <br>
+                    <br>
+                    Once the installation handshake completed (and either the AIRport App
+                    is running natively on the device or the demo tab is opened) the
+                    client App will proceed with the initial API request.  The request
+                    will contain the schema signature in it (along with schema version,
+                    the API object name, method name and call parameters).  At that point,
+                    AIRport App will:
+                    <ul>
+                        <li>
+                        Check if the schema is already installed. If it's not it will
+                        download the requested version of the schema, verify the signature,
+                        and install the schema DDL.
+                        </li>
+                        <li>
+                        If the schema is installed it will verify that the requested
+                        version of the schema matches the installed one, if not it will
+                        download the requested schema version and run the upgrade scripts
+                        to get it the the latest version.  If the schema has any other
+                        schemas it depends on AIRport will check/install those schemas
+                        before installing the requested schema.
+                        </li>
+                        <li>
+                        Once the schema is installed and all initialization/upgrade
+                        scripts have been run AIRport will load the library code into a 
+                        V8 isolate (either directly in the go code in the native app, or
+                        in a separate child iframe).
+                        </li>
+                        <li>
+                        With the schema code loaded it will run the client App's request
+                        and return the results.
+                        </li>
+                    </ul>
+                    <h2>TBD schema lookup</h2>
+                    I have more research to do on the process of looking up schemas.  It should
+                    be done in a way that is agnostic of the underlying storage technology
+                    used to accomplish it.  An easy solution would be to copy the Arweave GraphQL
+                    API and do everything via a number of lookups:
+                    
+                    <ul>
+                        <li>
+                        First lookup the schema by the "signature" tag
+                        </li>
+                        <li>
+                        Lookup the specified publisher via their "id" tag (to load their
+                        public key).
+                        </li>
+                    </ul>
+                    Of course all of this will need to be implemented.  That will have to come 
+                    later, as I'm now busy with implementing the core framework so stay tuned
+                    for next year! :)
+                </div> <!-- end entry content -->
+
+            </article> <!-- end column large-full entry-->
+
+
+            <div class="comments-wrap">
+            </div> <!-- end comment-respond -->
+
+        </main>
+
+    </div> <!-- end s-content -->
+
+
+    <!-- footer
+    ================================================== -->
+    <footer class="s-footer footer">
+    </footer>
+
+</div> <!-- end s-wrap -->
+
+
+<!-- Java Script
+================================================== -->
+<script src="../js/post-component-loader.js"></script>
+<script src="../js/jquery-3.2.1.min.js"></script>
+<script src="../js/plugins.js"></script>
+<script src="../js/main.js"></script>
+
+</body>

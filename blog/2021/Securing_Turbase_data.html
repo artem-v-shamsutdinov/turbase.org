@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html class="no-js" lang="en">
+
+<head>
+
+    <!--- basic page needs
+    ================================================== -->
+    <meta charset="utf-8">
+    <title>AIRport Blog</title>
+    <meta name="description" content="The solution for natural Dao logic">
+    <meta name="author" content="Artem V Shamsutdinov">
+
+    <!-- mobile specific metas
+    ================================================== -->
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- CSS
+    ================================================== -->
+    <link rel="stylesheet" href="../css/base.css">
+    <link rel="stylesheet" href="../css/vendor.css">
+    <link rel="stylesheet" href="../css/main.css">
+
+    <!-- script
+    ================================================== -->
+    <script src="../js/modernizr.js"></script>
+
+    <!-- favicons
+    ================================================== -->
+    <link rel="apple-touch-icon" sizes="180x180" href="../apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="../favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
+    <link rel="manifest" href="../site.webmanifest">
+
+</head>
+
+<body class="ss-bg-white">
+
+    <!-- preloader
+================================================== -->
+    <div id="preloader">
+        <div id="loader" class="dots-fade">
+            <div></div>
+            <div></div>
+            <div></div>
+        </div>
+    </div>
+
+    <div id="top" class="s-wrap site-wrapper">
+
+        <!-- site header
+    ================================================== -->
+        <header class="s-header header">
+        </header> <!-- end s-header -->
+
+
+        <!-- site content
+    ================================================== -->
+        <div class="s-content content">
+            <main class="row content__page">
+
+                <article class="column large-full entry format-standard">
+
+                    <div class="media-wrap entry__media">
+                        <div class="entry__post-thumb">
+                            <img alt="Tokamak Energy's ST40 reactor" sizes="(max-width: 1000px) 100vw, 1000px"
+                                src="images/Tokamak_Energy_reactor.jpg">
+                            <p style="text-align: center; width: 100%">
+                                Germany's <a href="https://www.ipp.mpg.de/w7x">
+                                    Wendelstein 7-X stellarator</a> achieved a
+                                <a href="https://www.sciencedaily.com/releases/2021/08/210831095614.htm">major performance advance</a>
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="content__page-header entry__header">
+                        <h1 class="display-1 entry__title">
+                            Securing Turbase data
+                        </h1>
+                        <ul class="entry__header-meta">
+                            <li class="author">By Artem V. Shamsutdinov</li>
+                            <li class="date">September 4th, 2021</li>
+                        </ul>
+                    </div> <!-- end entry__header -->
+
+                    <div class="entry__content">
+                        <p>In AIRport any given virtual repository can be in multiple states at the same time.  This
+                            is because multiple users can be using the same virtual repository.  Since they may be using
+                            a repository while being offline, the repository will get out of sync with the rest of 
+                            the devices that have it.  Hence, to keep track of that Turbase version controls
+                            all of virtual repositories using a simple Directed Acyclical Graph.   Each device keeps 
+                            track of the current version of the repository and performs conflict resolution as is
+                            necessary to ensure that any given repository will always end up in the same state once 
+                            all of the outstanding changes have been accumulated (based on entry timestamps). 
+                        </p>
+                        <p>
+                            Therefore, using private blockchains for each of the repositories is a natural fit.  A blockchain
+has all of the concepts of a Directed Acyclical Graph and adds signing of the data blocks
+to ensure authenticity.  Signing is possible because each Turbase installation can maintain
+its own private key in perfect secrecy, while providing its public key to the repository
+as soon as it joins it.
+                        </p>
+                        <h2>Sharing the data</h2>
+                        <p>
+                            These private blockchains are no-frills implementations of just the core blockchain technology
+and do not provide any platform for data distribution.  And while AIRport
+can be used in any environment (centralized or not) it makes sense for Turbase to use
+decentralized data sharing and storage technologies.  There is a multitude of projects out
+there that provide a decentralized data sharing platform and all are naturally blockchain based.
+The two that stand out are IPFS/Filecoin and Arweave.
+                        </p>
+                        <h3>IPFS/Filecoin</h3>
+                        <p>
+                            IPFS is the biggest decentralized storage ecosystem on the planet, which immediately makes for
+a very attractive candidate for Turbase integration.  As it's name states its an (Inter Planetray)
+File System which makes it a perfect fit for storing Trubase virtual repositories. This is because
+Turbase can split transaction log blocks into time based stuctures.  For example, a repository
+(represented by a directory) can be split up its transaction logs into years in which they
+where added, with one sub-directory for each year.  In turn each year directory can be split
+into months directories and those can be split into day and hour directories.  This is a very
+advantageous way of storing transaction logs since any Turbase App that gets out of sync
+can resume syncing its state from the the nearest hour at which it last synced a given
+vitual repository.
+                        </p>
+                        <p>
+                            Perhaps even more importantly since September 1st of 2021 the Filecoin foundation is officialy
+sponsoring AIRport development with an Open Source Development Grant.  Hence, it will be the
+first platform with which AIRport (and therefore Turbase) integrates.
+                        </p>
+                        <h3>Arweave</h3>
+                        <p>
+                            Another worthy candidate for integration is Arweave.  It provides permanent storage and is
+immediately a very good candidate for storing schemas and code that runs on Turbase (since
+those artifacts will be guaranteed to always be avialable).  Another good use for Arweave
+is for archiving repositories that are closed (with no additional transactions possible).
+At that point all of the transaction log entries can be compacted into a single file and
+placed on Arweave and indexed on IPFS via Arweave's IPFS bridge.  It is possible to place
+transaction logs on Arweave as well since it provides a GraphQL like query engine.  And,
+for the same exact reason, it is an excellent candidate for the Advertisement Platform
+query engine.
+                        </p>
+                    </div> <!-- end entry content -->
+
+                </article> <!-- end column large-full entry-->
+
+
+                <div class="comments-wrap">
+                </div> <!-- end comment-respond -->
+
+            </main>
+
+        </div> <!-- end s-content -->
+
+
+        <!-- footer
+    ================================================== -->
+        <footer class="s-footer footer">
+        </footer>
+
+    </div> <!-- end s-wrap -->
+
+
+    <!-- Java Script
+================================================== -->
+    <script src="../js/post-component-loader.js"></script>
+    <script src="../js/jquery-3.2.1.min.js"></script>
+    <script src="../js/plugins.js"></script>
+    <script src="../js/main.js"></script>
+
+</body>

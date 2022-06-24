@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html class="no-js" lang="en">
+<head>
+
+    <!--- basic page needs
+    ================================================== -->
+    <meta charset="utf-8">
+    <title>AIRport Blog</title>
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <!-- mobile specific metas
+    ================================================== -->
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- CSS
+    ================================================== -->
+    <link rel="stylesheet" href="../css/base.css">
+    <link rel="stylesheet" href="../css/vendor.css">
+    <link rel="stylesheet" href="../css/main.css">
+
+    <!-- script
+    ================================================== -->
+    <script src="../js/modernizr.js"></script>
+
+    <!-- favicons
+    ================================================== -->
+    <link rel="apple-touch-icon" sizes="180x180" href="../apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="../favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
+    <link rel="manifest" href="../site.webmanifest">
+
+</head>
+
+<body class="ss-bg-white">
+
+<!-- preloader
+================================================== -->
+<div id="preloader">
+    <div id="loader" class="dots-fade">
+        <div></div>
+        <div></div>
+        <div></div>
+    </div>
+</div>
+
+<div id="top" class="s-wrap site-wrapper">
+
+    <!-- site header
+    ================================================== -->
+    <header class="s-header header">
+    </header> <!-- end s-header -->
+
+
+    <!-- site content
+    ================================================== -->
+    <div class="s-content content">
+        <main class="row content__page">
+
+            <article class="column large-full entry format-standard">
+
+                <div class="media-wrap entry__media">
+                    <div class="entry__post-thumb">
+                        <img
+                                alt="A view of Cordova, Spain"
+                                sizes="(max-width: 2000px) 100vw, 2000px"
+                                src="images/Cordova_Spain.jpg"
+                        >
+                    </div>
+                </div>
+
+                <div class="content__page-header entry__header">
+                    <h1 class="display-1 entry__title">
+                        Airport in Cordova
+                    </h1>
+                    <ul class="entry__header-meta">
+                        <li class="author">By Artem V. Shamsutdinov</li>
+                        <li class="date">Early 2020</li>
+                    </ul>
+                </div> <!-- end entry__header -->
+
+                <div class="entry__content">
+                    <p>
+                        Initial designs behind Airport called for an all-in-browser framework.
+                        However after I did enough research this proved to be impractical for the
+                        following reasons:
+                    </p>
+
+                    <ul>
+                        <li>WebSql is deprecated and may be removed in the future</li>
+                        <li>Amount of allowed localStorage is severely limited, even if there
+                            is plenty of disk space
+                        </li>
+                        <li>Registry of servers would have to be centralized or maintained
+                            in separate processes
+                        </li>
+                    </ul>
+
+                    <p>
+                        While I still had hopes of running Airport in browser (at least in some
+                        corner cases), eventually I can to a realization that a separate process
+                        would be needed to run the Airport framework. However by then the bulk of
+                        the logic has already been written in TypeScript. So the natural choice
+                        for running Airport was a Node.js process. But Node.js does not run (at
+                        least not well) on mobile platforms and the only other platform I am aware
+                        of that runs on mobile and executes Javascript is
+                        <a href="https://cordova.apache.org/">Apache Cordova</a>. That solved all
+                        of the issues listed above and allowed to use other 3rd party frameworks
+                        for
+                        yet to be implemented features.
+                    </p>
+
+                    <p>
+                        Here is what a proposed component layout for a typical Airport
+                        installation
+                        is:
+                    </p>
+                    <img
+                            alt="Airport in Cordova - component layout"
+                            src="images/Airport_in_Cordova.png"
+                    >
+
+                    <h2>Cordova Side</h2>
+                    <p>
+                        The Cordova process will contain several internal components:
+                    </p>
+                    <ul>
+                        <li>A component that communicates with other Airport servers (yet to
+                            be determined)
+                        </li>
+                        <li>The core Airport framework running directly in WebView</li>
+                        <li>A management client (showing lists of repositories, applications,
+                            users, etc.) written in Ionic Framework (to look native)
+                        </li>
+                        <li>A SqLite process (where all of the data is persisted)</li>
+                        <li>A Web server, running on localhost only, used to communicate
+                            to local applications
+                        </li>
+                    </ul>
+                    <p>
+                        For security reasons, it is important to run the Web server that
+                        communicates
+                        with local applications on localhost only. This is allows for easier
+                        verification of actions by client applications. This guarantees that it
+                        is the user of the device (or a malicious script running locally) that is
+                        requesting access to the Airport database. All that is left to is prompt
+                        them
+                        with a Captcha and verify that indeed the user is performing the requested
+                        action.
+                    </p>
+                    <h2>Browser Side</h2>
+                    <p>
+                        On the browser side Airport runs inside an iframe and communicates both
+                        with
+                        the the localhost that it runs from and with the host application. It does
+                        does the communication with postMessage and does all necessary
+                        serialization
+                        of object graphs before sending them to local web server (and
+                        deserialization
+                        before passing them back to client application).
+                    </p>
+                    <p>
+                        The application only needs to run a small stub library that passes query
+                        query parameters and object graphs (for persistence) to Airport and
+                        receive
+                        object graphs back.
+                    </p>
+                </div> <!-- end entry content -->
+
+            </article> <!-- end column large-full entry-->
+
+
+            <div class="comments-wrap">
+            </div> <!-- end comment-respond -->
+
+        </main>
+
+    </div> <!-- end s-content -->
+
+
+    <!-- footer
+    ================================================== -->
+    <footer class="s-footer footer">
+    </footer>
+
+</div> <!-- end s-wrap -->
+
+
+<!-- Java Script
+================================================== -->
+<script src="../js/post-component-loader.js"></script>
+<script src="../js/jquery-3.2.1.min.js"></script>
+<script src="../js/plugins.js"></script>
+<script src="../js/main.js"></script>
+
+</body>

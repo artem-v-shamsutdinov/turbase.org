@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html class="no-js" lang="en">
+<head>
+
+    <!--- basic page needs
+    ================================================== -->
+    <meta charset="utf-8">
+    <title>AIRport Blog</title>
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <!-- mobile specific metas
+    ================================================== -->
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- CSS
+    ================================================== -->
+    <link rel="stylesheet" href="../css/base.css">
+    <link rel="stylesheet" href="../css/vendor.css">
+    <link rel="stylesheet" href="../css/main.css">
+
+    <!-- script
+    ================================================== -->
+    <script src="../js/modernizr.js"></script>
+
+    <!-- favicons
+    ================================================== -->
+    <link rel="apple-touch-icon" sizes="180x180" href="../apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="../favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
+    <link rel="manifest" href="../site.webmanifest">
+
+</head>
+
+<body class="ss-bg-white">
+
+<!-- preloader
+================================================== -->
+<div id="preloader">
+    <div id="loader" class="dots-fade">
+        <div></div>
+        <div></div>
+        <div></div>
+    </div>
+</div>
+
+<div id="top" class="s-wrap site-wrapper">
+
+    <!-- site header
+    ================================================== -->
+    <header class="s-header header">
+    </header> <!-- end s-header -->
+
+
+    <!-- site content
+    ================================================== -->
+    <div class="s-content content">
+        <main class="row content__page">
+
+            <article class="column large-full entry format-standard">
+
+                <div class="media-wrap entry__media">
+                    <div class="entry__post-thumb">
+                        <img
+                                alt="A view of Cordova, Spain"
+                                sizes="(max-width: 2000px) 100vw, 2000px"
+                                src="images/Highways_downtown_Abu_Dhabi.jpg"
+                        >
+                    </div>
+                </div>
+
+                <div class="content__page-header entry__header">
+                    <h1 class="display-1 entry__title">
+                        Highway
+                    </h1>
+                    <ul class="entry__header-meta">
+                        <li class="author">By Artem V. Shamsutdinov</li>
+                        <li class="date">July 28th, 2020</li>
+                    </ul>
+                </div> <!-- end entry__header -->
+
+                <div class="entry__content">
+                    <p>
+                        Quite a bit of code written as part of the Airport effort really has
+                        little to do with the concept of Autonomous Interdependent Repositories
+                        (AIR).
+                        <br>
+                        Here is a list core, already working features that are needed for
+                        Airport to function but are not strictly part of it:
+                    </p>
+                    <ul>
+                        <li>Entity Decorators</li>
+                        <li>Query Language</li>
+                        <li>DDL generation</li>
+                        <li>Query object generation</li>
+                        <li>Dependency Injection Framework</li>
+                    </ul>
+                    <p>
+                        In fact these can be used completely independently of Airport. So, I will
+                        soon be open-sourcing these features as their own project - Highway.
+                    </p>
+                    <h2>Highway design goals</h2>
+                    <p>
+                        The idea of the Highway project has been floating around my head for a
+                        while. Originally it was envisioned to be the traditional ("serverful")
+                        addon to Airport. It spawned from the realization that very few
+                        businesses using Airport would not have any centralized infrastructure.
+                        Most of them would probably have part of the data shared "globally",
+                        meaning the data is accessible to everyone. Hence a way to unite the
+                        purely group/personal oriented Airport data and globally accessible data
+                        behind a single front-end SDK.
+                    </p>
+                    <p>
+                        Very recently I came to a realization that Highway isn't just an addon
+                        to Airport. In fact is more of the opposite. Highway can stand alone
+                        as a project of its own (providing a way to work with traditional
+                        client/server data) where as Airport is an addon to that.
+                    </p>
+                    <p>
+                        With that in mind, here are the design goals behind highway:
+                    </p>
+                    <h3>Provide a better/more productive UI development experience</h3>
+                    <p>
+                        Current Javascript/Typescript ORMs fall short of what I would consider
+                        the "holy/grail" of ORMs. There is of course
+                        <a href="https://graphql.org/">GraphQL</a> but it does not tie itself to
+                        a relational database as a backing engine and requires writing and
+                        maintaining server-side code. Highway aims to provide a development
+                        experience that is inspired by GraphQL but is deeply rooted in the
+                        relational data model.
+                    </p>
+                    <h3>Provide a seamless integration with scalable technologies</h3>
+                    <p>
+                        A website backed by a relational database has severe performance
+                        limitations. Any significant usage spikes can lead to degraded site
+                        performance or even an outage. This can be traced to the need for querying
+                        a multitude of objects to come up with queryable views. Relational data
+                        model just doesn't scale as well as document oriented alternatives (or
+                        if it <a href="https://www.cockroachlabs.com/">does</a> it's costs are
+                        much higher then they would be with a more performance oriented
+                        <a href="https://www.scylladb.com/">option</a>). Highway aims to unify
+                        the NoSQL and relational worlds with a simple decorator. Given 2
+                        entities:
+                    </p>
+                    <pre><code>
+@Entity()
+<b>export class</b> Parent {
+
+    @Id()
+    @GeneratedValue()
+    key: <b>number</b>;
+
+    value: <b>string</b>;
+
+    @OneToMany({cascade: CascadeType.DELETE, mappedBy: 'parent'})
+    children: Child<[];
+}
+
+@Entity()
+<b>export class</b> Child {
+
+    @Id()
+    @GeneratedValue()
+    key: <b>number</b>;
+
+    value: <b>string</b>;
+
+    @ManyToOne()
+    parent: Parent;
+}
+                    </code></pre>
+                    <p>
+                        The query originally defined
+                        <a href="https://dataindependence.net/blog/2020/Build_time_Queries.html">here</a>
+                        can be simply amended with an <b>@View()</b> decorator:
+                    </p>
+                    <pre><code>
+<b>export class</b> ParentDao <b>extends</b> BaseParentDao {
+    @View()
+    @Query&lt;IQParent&gt;(select({
+            id: Y,
+            value: Y,
+            children: {
+                id: Y,
+                value: Y
+            }
+        }).from(p => ({
+            p,
+            c: p.children.innerJoin()
+        }).where((parentId, notLikeChildValue, q) =>
+            q.p.id == parentId
+            && !q.c.value.like(notLikeChildValue)
+        }).orderBy(q => [
+            q.p.id.desc(),
+            q.c.id.desc()
+        ]))
+    <b>static</b> selectWithChildren: (
+           parentId: number,
+           notLikeChildValue: string
+       ) => Promise&lt;Parent[]&gt;;
+}
+                    </code></pre>
+                    <p>This decorator informs Highway that this query is actually served by a
+                        NoSQL view. Highway can then take care of all the required details of
+                        maintaining a relational database and a NoSQL front-facing store in
+                        sync.</p>
+                    <h3>Provide a seamless integration with FTS technologies</h3>
+                    Quite a bit of the traffic going to modern sites deals with Full Text Search
+                    queries. While relational databases
+                    <a href="https://news.ycombinator.com/item?id=22223629">can</a> and
+                    <a href="https://azure.microsoft.com/en-us/blog/full-text-search-is-now-available-for-preview-in-azure-sql-database/">do</a>
+                    support full text search they by their nature won't be as efficient as
+                    <a href="https://vespa.ai/">specialized</a> solutions. Highway aims to
+                    hide the complexity of dealing with full text search implementations from
+                    the developer behind a simple <b>@Search</b>decorator:
+                    <code>
+                        <pre>
+@Entity()
+<b>export class</b> Parent {
+
+    @Id()
+    @GeneratedValue()
+    key: <b>number</b>;
+
+    @Search()
+    value: <b>string</b>;
+
+    @OneToMany({cascade: CascadeType.DELETE, mappedBy: 'parent'})
+    children: Child<[];
+}
+                        </pre>
+                    </code>
+                    <p>
+                        Entities can then be searched for using a set of query related concepts:
+                    </p>
+
+                    <pre><code>
+<b>export class</b> ParentDao <b>extends</b> BaseParentDao {
+    @Search()
+    <b>static</b> searchIdsOnly: (
+           searchString: string
+       ) => Promise&lt;number[]&gt;;
+
+    @Search()
+    <b>static</b> searchWholeEntities: (
+           searchString: string
+       ) => Promise&lt;Parent[]&gt;;
+
+    @Search()
+    @Query&lt;IQParent&gt;(select({
+            id: Y,
+            value: Y,
+            children: {
+                id: Y,
+                value: Y
+            }
+        }))
+    <b>static</b> searchWithChildren: (
+           searchString: string
+       ) => Promise&lt;Parent[]&gt;;
+}
+                    </code></pre>
+                    <p>Highway aims to hide the complexity of integrating a full text search
+                        engine (if any) with a relational database or a NoSQL view provider</p>
+
+                    <h3>Provide a seamless integration with auto-scalable technologies</h3>
+
+                    <p>Very few sites start out large-scale. Quite often you have no idea how
+                        big the concept behind the site will be and how much performance
+                        optimization
+                        will be required to keep it running. Highway aims to integrate
+                        cloud-native
+                        tech like autoscaling <a
+                                href="https://aws.amazon.com/keyspaces/">NoSQL</a>
+                        and <a href="https://aws.amazon.com/cloudsearch/">Full Text Search</a> (as
+                        well as <a href="https://aws.amazon.com/amazon-mq/">other</a>
+                        <a href="https://aws.amazon.com/lambda/">tech</a>
+                        <a href="https://aws.amazon.com/rds/aurora/">required</a> to scale your
+                        solution)
+                        with you only specifying a simple flag of how you want the solution to be
+                        deployed. Once your site hits those high traffic marks Highway aims to
+                        make your transition to more cost effective solutions as easy as switching
+                        a value of that same simple flag.</p>
+
+                    <h3>Support as many implementations as possible</h3>
+                    <p>By default Highway will support the AWS stack to back its scalability
+                        options. The intent is to support as many solutions as is practical.</p>
+                </div> <!-- end entry content -->
+
+            </article> <!-- end column large-full entry-->
+
+
+            <div class="comments-wrap">
+            </div> <!-- end comment-respond -->
+        </main>
+
+    </div> <!-- end s-content -->
+
+
+    <!-- footer
+    ================================================== -->
+    <footer class="s-footer footer">
+    </footer>
+
+</div> <!-- end s-wrap -->
+
+
+<!-- Java Script
+================================================== -->
+<script src="../js/post-component-loader.js"></script>
+<script src="../js/jquery-3.2.1.min.js"></script>
+<script src="../js/plugins.js"></script>
+<script src="../js/main.js"></script>
+
+</body>
