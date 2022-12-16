@@ -10,7 +10,7 @@
     "build": "tsc",
     "start": "node dist/index.js"
   },
-  "author": "Artem <artem.v.shamsutdinov@dataindependence.net>",
+  "author": "Artem <artem.v.shamsutdinov@turbase.app>",
   "license": "MIT",
   "dependencies": {
     "cross-env": "^7.0.3",
