@@ -1,15 +1,15 @@
 {
     "sites": [
         {
-            "subject": "turbase.app",
+            "subject": "turbase.org",
             "altnames": [
-                "turbase.app"
+                "turbase.org"
             ]
         },
         {
-            "subject": "www.turbase.app",
+            "subject": "www.turbase.org",
             "altnames": [
-                "www.turbase.app"
+                "www.turbase.org"
             ]
         }
     ]

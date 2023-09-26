@@ -6,7 +6,7 @@ require("greenlock-express")
         configDir: "./greenlock.d",
  
         // contact for security and critical bug notices
-        maintainerEmail: "artem.v.shamsutdinov@turbase.app",
+        maintainerEmail: "artem.v.shamsutdinov@beyond-decentralized.world",
  
         // whether or not to run at cloudscale
         cluster: false
