@@ -1,7 +1,7 @@
 {
-  "name": "turbase.app",
+  "name": "Turbase",
   "version": "1.0.0",
-  "description": "Turbase App market research site",
+  "description": "Turbase site",
   "scripts": {
     "watch": "tsc --watch --preserveWatchOutput --pretty",
     "dev": "cross-env NODE_ENV=development nodemon",
@@ -10,7 +10,7 @@
     "build": "tsc",
     "start": "node dist/index.js"
   },
-  "author": "Artem <artem.v.shamsutdinov@turbase.app>",
+  "author": "Artem <artem.v.shamsutdinov@dataindependence.net>",
   "license": "MIT",
   "dependencies": {
     "cross-env": "^7.0.3",
