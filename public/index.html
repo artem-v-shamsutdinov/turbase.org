@@ -17,80 +17,13 @@
     href="https://fonts.googleapis.com/css?family=Roboto:100,100i,300,300i,400,400i,500,500i,700,700i,900,900i|Open+Sans:300,300i,400,400i,600,600i,700,700i,800,800i">
   <link id="u-page-google-font" rel="stylesheet" href="https://fonts.googleapis.com/css?family=Coiny:400">
 
-
-
-
-
   <script type="application/ld+json">{
 		"@context": "http://schema.org",
 		"@type": "Organization",
 		"name": "",
-		"logo": "images/turbase-logo.png"
+		"logo": "images/turbase-logo.svg"
 }</script>
   <script>
-    function recordLoad() {
-      /*
-      document.getElementById('email1').addEventListener("keyup", function (event) {
-        if (event.key === "Enter") {
-          subscribe1();
-        }
-      });
-
-      document.getElementById('email2').addEventListener("keyup", function (event) {
-        if (event.key === "Enter") {
-          subscribe2();
-        }
-      });
-      */
-      record('load', '')
-    }
-    function recordLearnRevenue() {
-      record('learnRevenue', '')
-    }
-
-    function recordLearnSecurity() {
-      record('learnSecurity', '')
-    }
-
-    function recordGithubTop() {
-      record('githubTop', '')
-    }
-
-    function recordGithubBottom() {
-      record('githubBottom', '')
-    }
-
-    function recordBlog() {
-      record('blog', '')
-    }
-
-    function recordContact() {
-      record('contact', '')
-    }
-
-    emailSubmitted = false
-
-    function subscribe1() {
-      if (emailSubmitted) {
-        return
-      }
-      //var email = document.getElementById('email1').value
-      var email = 'YouTube channel'
-      //disableEmailForms(email)
-      record('subscribe', 'linkNumber=1&email=' + email)
-      window.location.href = 'https://www.youtube.com/channel/UCBBx4VJ73clVeUmUL9z9d2g'
-    }
-
-    function subscribe2() {
-      if (emailSubmitted) {
-        return
-      }
-      //var email = document.getElementById('email2').value
-      var email = 'YouTube channel'
-      //disableEmailForms(email)
-      record('subscribe', 'linkNumber=2&email=' + email)
-      window.location.href = 'https://www.youtube.com/channel/UCBBx4VJ73clVeUmUL9z9d2g'
-    }
 
     function disableEmailForms(email) {
       emailSubmitted = true
@@ -107,48 +40,17 @@
       document.getElementById('subscribe2').innerHTML = 'SUBSCRIBED'
     }
 
-    function record(urlSuffix, sendstr) {
-      // postAsync('http://localhost:3006/' + urlSuffix, sendstr)
-      postAsync(urlSuffix, sendstr)
-    }
-
-    function postAsync(url2get, sendstr) {
-      var req;
-      if (window.XMLHttpRequest) {
-        req = new XMLHttpRequest();
-      } else if (window.ActiveXObject) {
-        req = new ActiveXObject("Microsoft.XMLHTTP");
-      }
-      if (req != undefined) {
-        try {
-          req.open("POST", url2get, false); // 3rd param is whether "async"
-        }
-        catch (err) {
-          alert("couldnt complete request. Is JS enabled for that domain?\\n\\n" + err.message);
-          return false;
-        }
-        req.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-        req.send(sendstr); // param string only used for POST
-
-        if (req.readyState == 4) { // only if req is "loaded"
-          if (req.status == 200)  // only if "OK"
-          { return req.responseText; }
-          else { return "XHR error: " + req.status + " " + req.statusText; }
-        }
-      }
-      alert("req for getAsync is undefined");
-    }
   </script>
   <meta name="theme-color" content="#478ac9">
   <meta property="og:title" content="Home">
   <meta property="og:type" content="website">
 </head>
 
-<body onload="recordLoad();" data-home-page="index.html" data-home-page-title="Home" class="u-body">
+<body data-home-page="index.html" data-home-page-title="Home" class="u-body">
   <header class="u-clearfix u-header u-header" id="sec-3b9d">
     <div class="u-clearfix u-sheet u-valign-middle-xl u-sheet-1">
-      <a href="https://nicepage.com" class="u-image u-logo u-image-1" data-image-width="1200" data-image-height="1200">
-        <img src="images/turbase-logo.png" class="u-logo-image u-logo-image-1">
+      <a class="u-image u-logo u-image-1" data-image-width="1200" data-image-height="1200">
+        <img src="images/turbase-logo.svg" class="u-logo-image u-logo-image-1">
       </a>
       <nav class="u-menu u-menu-dropdown u-offcanvas u-menu-1">
         <div class="menu-collapse u-custom-font" style="font-size: 1rem; letter-spacing: 0px; font-family: Coiny;">
@@ -176,7 +78,7 @@
             </li>
             <li class="u-nav-item"><a
                 class="u-button-style u-nav-link u-text-active-custom-color-1 u-text-hover-custom-color-2"
-                href="index.html#carousel_e37d" data-page-id="700718257" style="padding: 10px 20px;">Earn</a>
+                href="index.html#carousel_e37d" data-page-id="700718257" style="padding: 10px 20px;">Discrete</a>
             </li>
             <li class="u-nav-item"><a
                 class="u-button-style u-nav-link u-text-active-custom-color-1 u-text-hover-custom-color-2"
@@ -197,7 +99,7 @@
                     data-page-id="700718257" style="padding: 10px 20px;">Intro</a>
                 </li>
                 <li class="u-nav-item"><a class="u-button-style u-nav-link" href="index.html#carousel_e37d"
-                    data-page-id="700718257" style="padding: 10px 20px;">Earn</a>
+                    data-page-id="700718257" style="padding: 10px 20px;">Discrete</a>
                 </li>
                 <li class="u-nav-item"><a class="u-button-style u-nav-link" href="index.html#carousel_2115"
                     data-page-id="700718257" style="padding: 10px 20px;">Secure</a>
@@ -217,12 +119,12 @@
     <div class="u-clearfix u-sheet u-sheet-1">
       <div class="u-align-left u-image u-image-circle u-image-1" data-image-width="1008" data-image-height="1013"></div>
       <div class="u-align-left u-image u-image-circle u-image-2" data-image-width="150" data-image-height="99"></div>
-      <div class="u-align-left u-border-12 u-border-white u-image u-image-circle u-image-3" data-image-width="1200"
+      <div class="u-align-left u-border-white u-image u-image-circle u-image-4" data-image-width="1200"
         data-image-height="1200"></div>
       <div class="u-container-style u-expanded-width-xs u-group u-shape-rectangle u-group-1">
         <div class="u-container-layout u-container-layout-1">
-          <h3 class="u-custom-font u-text u-text-grey-50 u-text-1">Your Personal Database</h3>
-          <h2 class="u-align-left u-custom-font u-text u-text-custom-color-1 u-text-2">Turbase</h2>
+          <h2 style="width: 100%;" class="turbase-name u-align-center u-custom-font u-text u-text-custom-color-1 u-text-2">Turbase</h2>
+          <h3 class="slogan u-align-center u-custom-font u-text u-text-custom-color-1 u-text-1">own your data</h3>
           <p class="u-custom-font u-text u-text-3" style="text-align: center;">
             <style>
               @media (min-width: 767px) {
@@ -246,7 +148,7 @@
                 }
               }
             </style>
-            <iframe onclick="alert('clicked iframe')" src="https://www.youtube.com/embed/lgZnXqQUP9U"
+            <iframe src="https://www.youtube.com/embed/lgZnXqQUP9U"
               title="YouTube video player" frameborder="0"
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
               allowfullscreen></iframe>
@@ -254,13 +156,13 @@
           <p class="u-custom-font u-text u-text-3">Turbase keeps your data on your
             device.&nbsp; You share data through secure blockchains.&nbsp; Applications access data directly on the
             device without storing it themselves.&nbsp; Turbase puts you in control of what you share and with whom.<br>
-            <br>Turbase works though <a onclick="recordGithubTop()"
-              href="https://github.com/beyond-decentralized/AIRport"
-              class="u-active-none u-border-none u-btn u-button-link u-button-style u-hover-none u-none u-text-palette-1-base u-btn-1">AIRport
+            <br>Turbase works though <a href="https://beyond-decentralized.world/documentation.html"
+              class="u-active-none u-border-none u-btn u-button-link u-button-style u-hover-none u-none u-text-palette-1-base u-btn-1">Beyond
+              Decentralized
             </a> techology.&nbsp;
           </p>
           <div class="u-form u-form-1">
-            <form action="#" method="POST" class="u-clearfix u-form-spacing-10 u-form-vertical u-inner-form"
+            <div action="#" method="POST" class="u-clearfix u-form-spacing-10 u-form-vertical u-inner-form"
               source="custom" name="form-1" style="padding: 10px;">
               <input type="hidden" id="siteId" name="siteId" value="1865615000">
               <input type="hidden" id="pageId" name="pageId" value="700718257">
@@ -271,18 +173,13 @@
                   class="u-border-1 u-border-grey-30 u-input u-input-rectangle u-white" required="">
               </div>
               -->
-              <div class="u-align-left u-form-group u-form-submit">
-                <a onclick="subscribe1();" href="#" id="subscribe1"
-                  class="u-btn u-btn-round u-btn-submit u-button-style u-custom-color-1 u-custom-font u-hover-custom-color-2 u-radius-15 u-btn-2">SUBSCRIBE</a>
-                <input type="button" value="submit" onclick class="u-form-control-hidden">
+              <div class="u-align-left u-form-group">
+                <a href="https://beyond-decentralized.world/documentation.html" id="subscribe1"
+                  class="u-btn u-btn-round u-btn-submit u-button-style u-custom-color-1 u-custom-font u-hover-custom-color-2 u-radius-15 u-btn-2">LEARN
+                  MORE</a>
               </div>
-              <div class="u-form-send-message u-form-send-success"> Thank you! Your message has been sent. </div>
-              <!--
-              <div class="u-form-send-error u-form-send-message"> Unable to send your message. Please fix errors then
-                try again. </div>
-                -->
               <input type="hidden" value="" name="recaptchaResponse">
-            </form>
+            </div>
           </div>
         </div>
       </div>
@@ -300,16 +197,18 @@
                 <div alt="" class="u-image u-image-circle u-preserve-proportions u-image-1" data-image-width="150"
                   data-image-height="99"></div>
                 <p class="u-custom-font u-text u-text-1">
-                  <span style="font-size: 1rem;">Turbase has an ​Advertisement&nbsp;engine on each device.&nbsp; It
-                    eliminates centralized data warehouses.&nbsp; Turbase
-                    Ads use only the data on your device.&nbsp; Turbase never shares your data with
-                    any Advertisement platform.<br>
-                    <br>Turbase shares Ad revenue and you get a cut of the profits.
+                  <span style="font-size: 1rem;">
+                    Turbase has a full-blown server on each device it runs on. It intelligently ensures data security
+                    even when data from multiple organizations is being processed. Turbase hierarchically structures
+                    data based on rules specified by organizations or user groups.
+                    <br>
+                    <br>
+                    Turbase data can be shared with discretion across only the intended users, even when those users
+                    belong to different organizations.
                   </span>
                   <br>
                 </p>
-                <a onclick="recordLearnRevenue();"
-                  href="https://beyond-decentralized.world/2021/Turbase_-_AIRport_with_Ad_Engine.html"
+                <a href="https://beyond-decentralized.world/2024/Organizations.html"
                   class="u-active-black u-border-none u-btn u-btn-round u-button-style u-custom-color-1 u-custom-font u-hover-custom-color-2 u-radius-8 u-text-active-white u-text-body-alt-color u-text-hover-white u-btn-1">learn
                   more</a>
               </div>
@@ -338,11 +237,10 @@
           </h1>
           <p class="u-custom-font u-text u-text-2">Turbase splits data into repositories.&nbsp; Each
             repository is shared ​independently&nbsp;of others and has its own private blockchain.&nbsp; Private data
-            is encrypted.<br>Repositories are shared through <a href="https://filecoin.io/" ​>Filecoin</a>
-            and <a href="https://www.arweave.org/">Arweave</a>.
+            is encrypted and signed by the member users and the device Turbase runs on. This ensures that every
+            change is performed by a verified user on a verified device.
           </p>
-          <a onclick="recordLearnSecurity();"
-            href="https://beyond-decentralized.world/blog/2021/Securing_Turbase_data.html"
+          <a href="https://beyond-decentralized.world/2021/Securing_Turbase_data.html"
             class="u-border-none u-btn u-btn-round u-button-style u-custom-color-2 u-custom-font u-hover-custom-color-1 u-radius-5 u-btn-1">learn
             more</a>
         </div>
@@ -354,44 +252,27 @@
   <section class="u-clearfix u-section-4" id="carousel_3341">
     <div class="u-clearfix u-sheet u-valign-bottom-md u-sheet-1">
       <img class="u-hidden-sm u-hidden-xs u-image u-image-circle u-preserve-proportions u-image-1"
-        src="images/turbase-turbine-small-white-background.png" alt="" data-image-width="600" data-image-height="600">
+        src="images/turbase-turbine-small-white-background.svg" alt="" data-image-width="600" data-image-height="600">
       <div class="u-align-left u-container-style u-custom-color-2 u-group u-group-1">
         <div class="u-container-layout u-container-layout-1">
           <h1 class="u-custom-font u-text u-text-1">Stay tuned</h1>
           <p class="u-custom-font u-text u-text-2">Turbase and AIRport are under
             development. Checkout the
-            progress on <a onclick="recordGithubBottom()"
-              href="https://github.com/beyond-decentralized/"
+            progress on <a href="https://github.com/beyond-decentralized/"
               class="u-active-none u-border-none u-btn u-button-link u-button-style u-hover-none u-none u-text-white u-btn-1">Github</a>
-            or visit the <a onclick="recordBlog()" href="https://beyond-decentralized.world/blog.html"
+            or visit the <a href="https://beyond-decentralized.world/blog.html"
               class="u-active-none u-border-none u-btn u-button-link u-button-style u-hover-none u-none u-text-white u-btn-2">blog</a>
             for what's happening now.
           </p>
           <div class="u-expanded-width-lg u-expanded-width-md u-expanded-width-sm u-expanded-width-xs u-form u-form-1">
-            <form action="#" class="u-clearfix u-form-spacing-10 u-form-vertical u-inner-form" source="custom"
+            <div class="u-clearfix u-form-spacing-10 u-form-vertical u-inner-form" source="custom"
               name="form" style="padding: 10px;">
-              <input type="hidden" id="siteId" name="siteId" value="1865615000">
-              <input type="hidden" id="pageId" name="pageId" value="700718257">
-              <!--
-              <div class="u-form-email u-form-group">
-                <label for="email-960a" class="u-form-control-hidden u-label"></label>
-                <input type="email" placeholder="Enter your email address" id="email2" name="email"
-                  class="u-border-1 u-border-grey-30 u-input u-input-rectangle u-white" required="" maxlength="100">
-              </div>
-              -->
               <div
-                class="u-align-left-lg u-align-left-md u-align-left-xl u-align-right-sm u-align-right-xs u-form-group u-form-submit">
-                <a onclick="subscribe2();" href="#" id="subscribe2"
-                  class="u-border-none u-btn u-btn-round u-btn-submit u-button-style u-custom-color-1 u-custom-font u-radius-10 u-btn-3">SUBSCRIBE</a>
-                <input type="button" value="submit" class="u-form-control-hidden">
+                class="u-align-left-lg u-align-left-md u-align-left-xl u-align-right-sm u-align-right-xs u-form-group">
+                <a href="https://beyond-decentralized.world/documentation.html"
+                  class="u-border-none u-btn u-btn-round u-btn-submit u-button-style u-custom-color-1 u-custom-font u-radius-10 u-btn-3">LEARN MORE</a>
               </div>
-              <div class="u-form-send-message u-form-send-success"> Thank you! Your message has been sent. </div>
-              <!--
-              <div class="u-form-send-error u-form-send-message"> Unable to send your message. Please fix errors then
-                try again. </div>
-                -->
-              <input type="hidden" value="" name="recaptchaResponse">
-            </form>
+            </div>
           </div>
         </div>
       </div>
@@ -406,7 +287,7 @@
   <footer class="u-align-center u-clearfix u-custom-color-2 u-footer u-footer" id="sec-619d">
     <div class="u-clearfix u-sheet u-sheet-1">
       <p class="u-custom-font u-small-text u-text u-text-variant u-text-1">Contact<br>
-        <a onclick="recordContact()" href="mailto:artem.v.shamsutdinov@dataindependence.net?subject=Turbase"
+        <a href="mailto:artem.v.shamsutdinov@dataindependence.net?subject=Turbase"
           class="u-active-none u-border-none u-btn u-button-style u-custom-color-1 u-custom-font u-hover-none u-text-white u-btn-1">E-Mail</a>
       </p>
     </div>

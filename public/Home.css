@@ -5,7 +5,7 @@
 .u-section-1 .u-image-1 {
   width: 646px;
   height: 646px;
-  background-image: url("images/AIRport_icon_wide_blue_background1.0.png");
+  background-image: url("images/beyond-decentralized-logo.svg");
   background-position: 50% 50%;
   margin: 157px 70px 0 auto;
 }
@@ -13,7 +13,7 @@
 .u-section-1 .u-image-2 {
   width: 646px;
   height: 646px;
-  background-image: url("images/b515bbd5b7fd679566981efe8eb6349a393afaab6dbeba02ebe4406b234ef1baf580c1638eb3ef8f5378c8877127d03d8468bce331b2bc492b0819_1280.jpg");
+  background-image: url("images/turbase-turbine-no-padding-transparent.png");
   background-position: 50% 50%;
   margin: -733px auto 0 85px;
 }
@@ -21,7 +21,15 @@
 .u-section-1 .u-image-3 {
   width: 283px;
   height: 283px;
-  background-image: url("images/turbase-logo-white-background.png");
+  background-image: url("images/turbase-logo-white-background.svg");
+  background-position: 50% 50%;
+  margin: -157px auto 0 28px;
+}
+
+.u-section-1 .u-image-4 {
+  width: 283px;
+  height: 283px;
+  background-image: url("images/b515bbd5b7fd679566981efe8eb6349a393afaab6dbeba02ebe4406b234ef1baf580c1638eb3ef8f5378c8877127d03d8468bce331b2bc492b0819_1280.jpg");
   background-position: 50% 50%;
   margin: -157px auto 0 28px;
 }
@@ -46,12 +54,20 @@
   margin: 218px 0 0;
 }
 
+.u-section-1 .slogan.u-text-1 {
+  margin-top: 25px !important;
+}
+
 .u-section-1 .u-text-2 {
   font-size: 11.25rem;
   background-image: none;
   font-family: Coiny;
   font-weight: 700;
   margin: -304px 0 0;
+}
+
+.u-section-1 .turbase-name.u-text-2 {
+  margin: 30px 0 0 !important;
 }
 
 .u-section-1 .u-text-3 {
@@ -98,7 +114,7 @@
     margin-left: 37px;
   }
 
-  .u-section-1 .u-image-3 {
+  .u-section-1 .u-image-3, .u-section-1 .u-image-4 {
     margin-top: 0;
     margin-left: 0;
   }
@@ -163,7 +179,7 @@
     margin-left: 0;
   }
 
-  .u-section-1 .u-image-3 {
+  .u-section-1 .u-image-3, .u-section-1 .u-image-4 {
     width: 251px;
     height: 251px;
     margin-top: -99px;
@@ -228,7 +244,7 @@
     margin-left: -16px;
   }
 
-  .u-section-1 .u-image-3 {
+  .u-section-1 .u-image-3, .u-section-1 .u-image-4 {
     width: 208px;
     height: 208px;
     margin-top: -44px;
@@ -293,7 +309,7 @@
     margin-left: -50px;
   }
 
-  .u-section-1 .u-image-3 {
+  .u-section-1 .u-image-3, .u-section-1 .u-image-4 {
     width: 171px;
     height: 171px;
     margin-top: -38px;
@@ -357,7 +373,7 @@
 .u-section-2 .u-image-1 {
   width: 234px;
   height: 234px;
-  background-image: url("images/7a042765e7ebb43336ca64011d4baa8076352584592dc671f6bbae512baf1ebc238104f1a4b281ef9f3b3c23fb1e73bd93ca2730c97946fc7e124b_1280.jpg");
+  background-image: url("images/tupolev-tu-144-engine-exhaust.jpeg");
   background-position: 50% 50%;
   margin: -58px auto 0;
 }
@@ -381,7 +397,7 @@
 
 .u-section-2 .u-image-2 {
   min-height: 707px;
-  background-image: url("images/cash-money.jpg");
+  background-image: url("images/Beyond-Decentralized-Security.png");
   background-position: 50% 50%;
 }
 
@@ -392,7 +408,7 @@
 .u-section-2 .u-image-3 {
   width: 234px;
   height: 234px;
-  background-image: url("images/turbase-turbine-small-white-background.png");
+  background-image: url("images/turbase-turbine-small-white-background.svg");
   background-position: 50% 50%;
   margin: 518px 118px -74px auto;
 }
@@ -598,7 +614,7 @@
 .u-section-3 .u-image-2 {
   width: 234px;
   height: 234px;
-  background-image: url("images/turbase-turbine-small-white-background.png");
+  background-image: url("images/turbase-turbine-small-white-background.svg");
   background-position: 50% 50%;
   margin: -1103px 108px 60px auto;
 }
@@ -799,7 +815,7 @@
   height: 537px;
   width: 537px;
   object-position: 100% 50%;
-  background-image: url("images/turbase-logo-white-background.png");
+  background-image: url("images/turbase-logo-white-background.svg");
   background-position: 50% 50%;
   margin: -680px auto 0 82px;
 }
@@ -807,7 +823,7 @@
 .u-section-4 .u-image-3 {
   height: 310px;
   width: 310px;
-  background-image: url("images/AIRport_icon_wide_blue_background1.0.png");
+  background-image: url("images/beyond-decentralized-logo.svg");
   background-position: 50% 50%;
   margin: -96px auto 60px -32px;
 }
